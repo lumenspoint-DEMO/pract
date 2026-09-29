@@ -1,1 +1,879 @@
+# Q1. Water Jug – State Space Possibilities
+
+from collections import deque
+
+def water_jug(a, b, goal):
+    q = deque([((0,0), [])])
+    seen = set()
+
+    while q:
+        state, path = q.popleft()
+
+        if state in seen:
+            continue
+
+        seen.add(state)
+        path = path + [state]
+
+        if state == goal:
+            return path
+
+        x, y = state
+
+        next_states = [
+            (a, y),                         # Fill jug A
+            (x, b),                         # Fill jug B
+            (0, y),                         # Empty jug A
+            (x, 0),                         # Empty jug B
+            (max(0, x - (b - y)), min(b, x + y)),  # A -> B
+            (min(a, x + y), max(0, y - (a - x)))   # B -> A
+        ]
+
+        for s in next_states:
+            if s not in seen:
+                    q.append((s, path))
+
+    return None
+
+
+solution = water_jug(5, 4, (2, 0))
+
+print("Solution Path:")
+print(solution)
+
+#epp
+
+from collections import deque
+
+goal = "123456780"
+
+moves = {
+    0:[1,3], 1:[0,2,4], 2:[1,5],
+    3:[0,4,6], 4:[1,3,5,7], 5:[2,4,8],
+    6:[3,7], 7:[4,6,8], 8:[5,7]
+}
+
+def bfs(start):
+    q = deque([(start, [])])
+    visited = set()
+
+    while q:
+        state, path = q.popleft()
+
+        if state == goal:
+            return path + [state]
+
+        if state in visited:
+            continue
+        visited.add(state)  
+
+        zero = state.index("0")
+
+        for m in moves[zero]:
+            s = list(state)
+            s[zero], s[m] = s[m], s[zero]
+            new = "".join(s)
+
+            if new not in visited:
+                q.append((new, path + [state]))
+
+start = "312645708"
+solution = bfs(start)
+
+for s in solution:
+    print(s[:3])
+    print(s[3:6])
+    print(s[6:])
+    print()
+#tower of hanoi
+def hanoi(n, source, helper, destination):
+    if n == 1:
+        print("Move disk 1 from", source, "to", destination)
+        return
+
+    hanoi(n-1, source, destination, helper)
+
+    print("Move disk", n, "from", source, "to", destination)
+
+    hanoi(n-1, helper, source, destination)
+
+
+hanoi(3, "A", "B", "C")
+
+
+#prac 2
+
+from collections import deque
+
+def bfs(graph, start):
+    visited = []
+    queue = deque([start])
+
+    while queue:
+        node = queue.popleft()
+
+        if node not in visited:
+            visited.append(node)
+            queue.extend(graph[node])
+
+    return visited
+
+
+def all_paths(graph, start, end, path=[]):
+    path = path + [start]
+
+    if start == end:
+        print(path)
+        return
+
+    for node in graph[start]:
+        if node not in path:
+            all_paths(graph, node, end, path)
+
+
+def shortest_path(graph, start, end):
+    queue = deque([[start]])
+
+    while queue:
+        path = queue.popleft()
+        node = path[-1]
+
+        if node == end:
+            return path
+
+        for next_node in graph[node]:
+            if next_node not in path:
+                queue.append(path + [next_node])
+
+
+graph = {
+    'A':['B','D'],
+    'B':['C','F'],
+    'C':['E','G','H'],
+    'D':['F'],
+    'E':['B','F'],
+    'F':['A'],
+    'G':['E','H'],
+    'H':['A']
+}
+
+print("BFS Traversal:")
+print(bfs(graph, 'A'))
+
+print("\nAll paths from A to E:")
+all_paths(graph, 'A', 'E')
+
+print("\nShortest path A to E:")
+print(shortest_path(graph, 'A', 'E'))
+
+#2 dfs 
+graph = {
+    'M':['N','Q','R'],
+    'N':['O','Q','M'],
+    'R':['M'],
+    'O':['P','N'],
+    'Q':['M','N','P'],
+    'P':['O','Q']
+}
+
+def dfs(g, n, seen, d):
+    if n not in seen:                # Check if node is not visited
+        seen.append(n)                # Mark node as visited
+
+        for i in g[n]:                # Check all neighbours
+            if seen[-1] is d:         # If destination is reached
+                break                 # Stop searching
+
+            dfs(g, i, seen, d)        # Go deeper into next node
+
+        return seen                   # Return visited nodes
+
+print("Traversal By DFS")
+print(dfs(graph, 'M', [], 'P'))
+
+#prac 3
+#Q1  Greedy Best First Search
+
+graph = {
+    "S": {"A": 2, "D": 1, "E": 3},
+    "A": {"D": 1},
+    "D": {"B": 3, "G": 2},
+    "B": {"C": 2},
+    "C": {"G": 3},
+    "E": {"G": 1},
+    "G": {}
+}
+
+# Heuristic values h(n)
+h = {
+    "S": 6,
+    "A": 3,
+    "D": 4,
+    "B": 2,
+    "C": 2,
+    "E": 5,
+    "G": 0
+}
+
+def greedy(start, goal):
+    current = start        # Start from the given source node
+    path = [current]     # Store the path
+ # Continue until we reach the goal
+    while current != goal:
+# Get all neighbouring nodes of current node
+        neighbours = graph[current]
+# If there are no neighbours, path is not possible
+        if not neighbours:
+            return []
+
+        # Find neighbour with smallest h value
+        next_node = None
+        smallest = 999
+
+        for node in neighbours:
+            if h[node] < smallest:
+                smallest = h[node]
+                next_node = node
+
+        print("Choosing:", next_node)     # Display which node is selected
+
+        current = next_node  # Move to the selected node
+        path.append(current)   # Add the selected node to the path
+    return path
+
+
+source = input("Enter Source vertex: ")
+
+path = greedy(source, "G")
+
+print("Path:", path)
+
+
+#Q2 A* Graph → calculate f → choose smallest f → move there → repeat until G.
+
+graph = {
+    "S": {"A":2, "D":1, "E":3},
+    "A": {"D":1},
+    "D": {"B":3, "G":2},
+    "B": {"C":2},
+    "C": {"G":3},
+    "E": {"G":1},
+    "G": {}
+}
+
+h = {"S":6, "A":3, "D":4, "B":2, "C":2, "E":5, "G":0}
+
+def astar(start, goal):
+    path = [start]    # Store the path we are following.  # Initially, path contains only the starting node.
+    g = 0 # g = actual cost travelled so far.  # At the beginning, we have travelled 0.
+
+    while start != goal:
+        best = None   # best will store the next node we choose.
+        f = 999
+
+        for node in graph[start]:       # Check every node connected to the current node.
+            new_f = g + graph[start][node] + h[node]
+
+            if new_f < f:# If this node has a smaller f value,      # select this node as the best next node.
+                f = new_f
+                best = node
+
+        g += graph[start][best]
+        start = best
+        path.append(best)
+
+    return path
+
+source = input("Enter Source: ")
+print("Path:", astar(source, "G"))
+
+
+
+#prac 4
+
+# N-Queen Problem
+
+def solve(board, row, n):
+    # If all rows are completed, print the board
+    if row == n:
+        for r in board:
+            print(" ".join(r))
+        return True
+
+    # Try each column in the current row
+    for col in range(n):
+        safe = True
+
+        # Check the column
+        for r in range(row):
+            if board[r][col] == "Q":
+                safe = False
+
+        # Check upper-left diagonal
+        for r, c in zip(range(row-1, -1, -1), range(col-1, -1, -1)):
+            if board[r][c] == "Q":
+                safe = False
+
+        # Check upper-right diagonal
+        for r, c in zip(range(row-1, -1, -1), range(col+1, n)):
+            if board[r][c] == "Q":
+                safe = False
+
+        # If position is safe, place the queen
+        if safe:
+            board[row][col] = "Q"
+
+            # Solve for the next row
+            if solve(board, row+1, n):
+                return True
+
+            # If solution fails, remove the queen
+            board[row][col] = "."
+
+    return False
+
+# Take N from the user
+n = int(input("Enter N: "))
+
+# Create an empty board
+board = [["." for _ in range(n)] for _ in range(n)]
+
+# Start solving from row 0
+solve(board, 0, n)
+
+
+#CSP MAP v
+
+import itertools
+colors = ["Red", "Blue", "Yellow"]
+variables = ["A", "B", "C"]
+for x in itertools.product(colors, repeat=3):
+    A, B, C = x
+    if A != B and B != C and A != C:
+    print({"A": A, "B": B, "C": C})
+
+
+#prac 5
+
+# Aim: Simulation of Tic-Tac-Toe Game Q1
+
+# Create an empty board with 9 positions
+board = [' ' for _ in range(9)]
+
+# Start with Player X
+player = 'X'
+
+
+# Function to display the board
+def show_board():
+
+    # Display first row
+    print(f'| {board[0]} | {board[1]} | {board[2]}')
+    print('-----------------')
+
+    # Display second row
+    print(f'| {board[3]} | {board[4]} | {board[5]}')
+    print('-----------------')
+
+    # Display third row
+    print(f'| {board[6]} | {board[7]} | {board[8]}')
+    print('-----------------')
+
+# Function to check if a player has won
+def is_winner(p):
+
+    return (
+        # Check rows
+        (board[0] == p and board[1] == p and board[2] == p) or
+        (board[3] == p and board[4] == p and board[5] == p) or
+        (board[6] == p and board[7] == p and board[8] == p) or
+
+        # Check columns
+        (board[0] == p and board[3] == p and board[6] == p) or
+        (board[1] == p and board[4] == p and board[7] == p) or
+        (board[2] == p and board[5] == p and board[8] == p) or
+
+        # Check diagonals
+        (board[0] == p and board[4] == p and board[8] == p) or
+        (board[2] == p and board[4] == p and board[6] == p)
+    )
+
+
+# Function to check if the game is a tie
+def is_tie():
+
+    # If there is no empty space, it is a tie
+    return ' ' not in board
+
+
+# Main game function
+def game():
+    # We are changing the global player variable
+    global player
+
+    while True:
+  # Show the current board
+        show_board()
+        try:
+            # Ask player to enter a position
+            move = int(input(f"Player {player}, enter 0-8: "))
+    
+            # Check if position is valid and empty
+            if 0 <= move <= 8 and board[move] == ' ':
+
+                # Put player's symbol on the board
+                board[move] = player
+
+                # Check if player has won
+                if is_winner(player):
+                    show_board()
+                    print(f"Player {player} wins!")
+                    break
+   # Check if game is a tie
+                elif is_tie():
+                    show_board()
+                    print("It's a tie!")
+                    break
+ # Change player X to O
+                if player == 'X':
+                    player = 'O'
+  # Change player O to X
+                else:
+                    player = 'X'
+
+            else:
+                # Show error for invalid position
+                print("Invalid move. Choose an empty position from 0-8.")
+
+        # Handle wrong input
+        except (ValueError, IndexError):
+            print("Invalid input. Enter a number from 0-8.")
+# Start the game
+game()
+
+# Alpha-Beta Pruning
+
+# Create the game tree
+tree = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F', 'G'],
+    'D': [4, 3],
+    'E': [6, 2],
+    'F': [2, 1],
+    'G': [9, 5]
+}
+
+
+#Q2 Minimax with Alpha-Beta
+def minimax(node, depth, alpha, beta, max_player):
+
+    # If we reach the leaf, return its value
+    if depth == 0:
+        return node
+
+    # Maximizing player
+    if max_player:
+        value = -999
+
+        for child in tree[node]:
+            value = max(value, minimax(child, depth-1,
+                                       alpha, beta, False))
+
+            # Update alpha
+            alpha = max(alpha, value)
+
+            # Prune the branch
+            if alpha >= beta:
+                break
+
+        return value
+
+    # Minimizing player
+    else:
+        value = 999
+
+        for child in tree[node]:
+            value = min(value, minimax(child, depth-1,
+                                       alpha, beta, True))
+
+            # Update beta
+            beta = min(beta, value)
+
+            # Prune the branch
+            if alpha >= beta:
+                break
+
+        return value
+
+
+# Start the algorithm
+best = minimax('A', 3, -999, 999, True)
+
+# Display result
+print("Best score:", best)
+
+#prac 6
+Q1.MISSIONARY AND CANIBAL
+
+from collections import deque
+
+def is_valid(m_left, c_left, m_total, c_total):
+    m_right = m_total - m_left
+    c_right = c_total - c_left
+
+    if m_left < 0 or c_left < 0 or m_right < 0 or c_right < 0:
+        return False
+
+    if m_left > 0 and c_left > m_left:
+        return False
+
+    if m_right > 0 and c_right > m_right:
+        return False
+
+    return True
+
+def solve(m_total, c_total, direction):
+    boat = 0 if direction.lower() == "left" else 1
+
+    start = (m_total, c_total, boat)
+    goal = (0, 0, 1)
+
+    queue = deque([(start, [])])
+    visited = set()
+
+    moves = [
+        (2, 0),
+        (1, 0),
+        (0, 2),
+        (0, 1),
+        (1, 1)
+    ]
+
+    while queue:
+        state, path = queue.popleft()
+
+        if state in visited:
+            continue
+
+        visited.add(state)
+
+        if state == goal:
+            return path
+
+        m_left, c_left, boat = state
+
+        for m, c in moves:
+            if m + c == 0:
+                continue
+
+            if boat == 0:
+                new_state = (m_left - m, c_left - c, 1)
+                text = f"Move {m} missionary(s) and {c} cannibal(s) Left -> Right"
+            else:
+                new_state = (m_left + m, c_left + c, 0)
+                text = f"Move {m} missionary(s) and {c} cannibal(s) Right -> Left"
+
+            if is_valid(new_state[0], new_state[1], m_total, c_total):
+                queue.append((new_state, path + [text]))
+
+    return None
+
+
+missionaries = int(input("Enter number of missionaries: "))
+cannibals = int(input("Enter number of cannibals: "))
+direction = input("Enter boat starting direction (left/right): ")
+
+answer = solve(missionaries, cannibals, direction)
+
+if answer:
+    print("\nCorrect Solution:\n")
+
+    for i, step in enumerate(answer, 1):
+        print(f"{i}. {step}")
+else:
+    print("No solution exists.")
+
+Q2. SHUFFLE DECK OF CARDS
+
+import random
+
+deck = [rank + suit for suit in ['spades', 'clubs', 'diamonds', 'hearts']
+        for rank in ['A','1','2','3','4','5','6','7','8','9','10','J','Q','K']]
+
+random.shuffle(deck)
+
+n = int(input("How many cards do you want to draw? "))
+
+if n <= len(deck):
+    for i in range(n):
+        print(deck[i])
+else:
+    print("Not enough cards in the deck!")
+
+#PR8.PROLOG
+Q1.
+male(john).
+male(mike).
+male(david).
+
+female(susan).
+female(lisa).
+female(anna).
+
+parent(john,mike).
+parent(john,lisa).
+parent(susan,mike).
+parent(susan,lisa).
+parent(mike,david).
+parent(anna,david).
+
+father(F,C):-male(F),parent(F,C).
+
+mother(M,C):-female(M),parent(M,C).
+
+grandfather(GF,C):-male(GF),parent(GF,P),parent(P,C).
+
+grandmother(GM,C):-female(GM),parent(GM,P),parent(P,C).
+
+siblings(X,Y):-parent(P,X),parent(P,Y),X\=Y.
+
+Q2.STUDENT EXAMPLE
+student(rahul,math,80).
+student(rohit,science,87).
+student(sitaram,math,92).
+student(paras,history,88).
+
+high_score(Name):-student(Name,_,Marks),Marks>80.
+
+math_student(Name):-student(Name,math,_).
+
+topper(Name,Subject,Marks):-student(Name,Subject,Marks),\+((student(_,Subject,Marks2),Marks2>Marks)).
+#9 prac
+#how install. python -m pip install pandas scikit-learn matplotlib
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from matplotlib import pyplot as plt
+from sklearn import tree
+
+col_names = ["Reservation", "Raining", "BadService", "Satur", "Result"]
+
+hoteldata = pd.read_csv("dtree.csv", header=None, names=col_names)
+
+feature_cols = ["Reservation", "Raining", "BadService", "Satur"]
+
+X = hoteldata[feature_cols]
+y = hoteldata.Result
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1
+)
+
+print(hoteldata)
+
+print("X_train data:", X_train)
+print("X_test data:", X_test)
+print("Y_train data:", y_train)
+print("Y_test data:", y_test)
+
+clf = DecisionTreeClassifier(criterion="entropy", max_depth=5)
+
+clf = clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+print("ytest =", X_test)
+print("ypred =", y_pred)
+
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+
+print("Confusion Matrix:", metrics.confusion_matrix(y_test, y_pred))
+
+fig = plt.figure(figsize=(8, 13))
+
+t = tree.plot_tree(
+    clf,
+    feature_names=feature_cols,
+    class_names=["Leave", "Wait"],
+    filled=True
+)
+
+fig.savefig("decision_tree.png")
+
+plt.show()
+
+Q2 naive bayes.
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn import metrics
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+
+df = pd.read_csv("customer_profiles.csv")
+
+target_col = "output"
+
+X = df.drop(columns=[target_col])
+y = df[target_col]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1
+)
+
+print(df)
+
+print("X_train data :", X_train)
+print("X_test data :", X_test)
+print("Y_train data :", y_train)
+print("Y_test data :", y_test)
+
+NB = GaussianNB()
+NB = NB.fit(X_train, y_train)
+
+y_pred = NB.predict(X_test)
+
+print("ytest =", X_test)
+print("ypred =", y_pred)
+
+print("Accuracy :", metrics.accuracy_score(y_test, y_pred))
+
+cm = metrics.confusion_matrix(y_test, y_pred)
+
+print("Confusion Matrix :", cm)
+
+plt.figure(figsize=(6, 4.5))
+
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt="d",
+    cmap="Blues",
+    xticklabels=["Class 0", "Class 1"],
+    yticklabels=["Class 0", "Class 1"],
+)
+
+plt.title(
+    f"Gaussian Naive Bayes Confusion Matrix\n"
+    f"Accuracy: {metrics.accuracy_score(y_test, y_pred) * 100:.1f}%"
+)
+
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+
+plt.tight_layout()
+plt.show()
+
+
+
+#pr 10
+Q1.svm 
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import svm
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+
+iris = load_iris()
+
+print(iris.data)
+print("Feature name:", iris.feature_names)
+print("Labels:", iris.target_names)
+
+x_train, x_test, y_train, y_test = train_test_split(
+    iris.data,
+    iris.target,
+    test_size=0.4,
+    random_state=1
+)
+
+classifier = svm.SVC(kernel='linear')
+
+print("x train:", x_train)
+print("y train:", y_train)
+
+classifier.fit(x_train, y_train)
+
+print("Test data:", x_test)
+
+y_pred = classifier.predict(x_test)
+
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+
+iris = load_iris()
+
+x = iris.data[:, :2]  # We only take the first 2 features
+y = iris.target
+
+plt.scatter(
+    x[:, 0],
+    x[:, 1],
+    c=y,
+    cmap=plt.cm.coolwarm
+)
+
+plt.xlabel('Sepal Length')
+plt.ylabel('Sepal Width')
+plt.title('Sepal width & length')
+
+plt.show()
+
+
+Q2.KNN
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_iris
+from sklearn.metrics import confusion_matrix
+import seaborn as sn
+import matplotlib.pyplot as plt
+
+iris = load_iris()
+
+print(iris)
+print(iris.feature_names)
+
+x = iris.data
+y = iris.target
+
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.3, random_state=1
+)
+
+knn = KNeighborsClassifier(n_neighbors=10)
+
+train = knn.fit(x_train, y_train)
+
+print("Target Names are:", iris.target_names)
+print("Size of test data:", len(x_test))
+print("X values of test:", x_test)
+print("Y values of test data:", y_test)
+
+print("Predicted classes for above testing data:")
+
+y_pred = train.predict(x_test)
+
+print("P values of Test data:", y_pred)
+
+print("Accuracy of model:")
+print(knn.score(x_test, y_test))
+
+print("Confusion matrix of model:")
+
+cm = confusion_matrix(y_test, y_pred)
+
+print(cm)
+
+plt.figure(figsize=(7, 5))
+sn.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+
+plt.xlabel("Predicted")
+plt.ylabel("Truth")
+plt.title("KNN Confusion Matrix")
+
+plt.show()
+
+
 
