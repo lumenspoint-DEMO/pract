@@ -1,2 +1,1 @@
-git-commands.txt
-vm-notes.txt
+notes.txt
