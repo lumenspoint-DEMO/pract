@@ -1,7 +1,9 @@
 $base = "https://raw.githubusercontent.com/lumenspoint-DEMO/pract/main"
 $dest = Join-Path ([Environment]::GetFolderPath("Desktop")) "pract-docs"
+
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
-Write-Host "Downloading into $dest ..."
+Write-Host "Creating folder: $dest"
+
 $list = (Invoke-RestMethod "$base/files.txt") -split "`n"
 foreach ($f in $list) {
     $f = $f.Trim()
@@ -13,4 +15,6 @@ foreach ($f in $list) {
         Write-Host "FAILED: $f"
     }
 }
-Write-Host "Done! Files are in: $dest"
+
+Write-Host "Done! Opening folder..."
+Invoke-Item $dest
