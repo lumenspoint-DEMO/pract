@@ -1,694 +1,1012 @@
-Q.1)WATER JUG PROBLEM
+:- Using States in Components
+Q1)
+import React, { Component } from "react"
 
-from collections import deque
-def water_jug_bfs():
-    max_a, max_b = 6, 5
-    goal = 3
-    start = (0, 0)
-    queue = deque([start])
-    visited = {start}
-    parent = {start: None}
-    
-    while queue:
-        a, b = queue.popleft()
-        if a == goal or b == goal:
-            print("Found a Solution!\n")
-            # Print solution path
-            path = []
-            state = (a, b)
-            while state is not None:
-                path.append(state)
-                state = parent[state]
-            path.reverse()
-
-            print("Solution Path:")
-            for s in path:
-                print(f"Jug A: {s[0]}L, Jug B: {s[1]}L")
-            return
-
-        # Generate all possible next states
-        possible_states = [
-            (max_a, b),                                  # Fill Jug A
-            (a, max_b),                                  # Fill Jug B
-            (0, b),                                      # Empty Jug A
-            (a, 0),                                      # Empty Jug B
-            (min(a + b, max_a), b - (min(a + b, max_a) - a)),  # Pour B -> A
-            (a - (min(a + b, max_b) - b), min(a + b, max_b))   # Pour A -> B
-        ]
-        for state in possible_states:
-            if state not in visited:
-                visited.add(state)
-                parent[state] = (a, b)
-                queue.append(state)
-    print("No solution found.")
-    
-water_jug_bfs()
-
-Q.2)Tower of hanoi 
-Code: 
-def toh(n,fromrod,torod,auxrod):
-    if n==0:
-        return
-    toh(n-1,fromrod,auxrod,torod)
-    print('move disk',n,'fromrod',fromrod,'torod',torod)
-    toh(n-1,auxrod,torod,fromrod)
-n=3
-toh(n,'a','c','b')
-
-Q.3)Number puzzle problem 
-Code: 
-
-from collections import deque
-
-goal = '123456780'
-moves = { 0:[1,3],1 :[0,2,4], 2:[1,5], 3:[0,4,6], 4:[1,3,5,7], 5:[2,4,8], 6:[3,7], 7:[4,6,8], 8:[5,7] }
-def bfs(start):
-    visited = set()
-    queue = deque([(start, [])])
-    while queue:
-        state,path =queue.popleft()
-        if state  == goal:
-            return path + [state]
-        if state in visited:
-            continue
-        visited.add(state)
-        zero =state.index('0')
-        for move in moves[zero]:
-            new_state = list(state)
-            new_state[zero] , new_state[move] =new_state[move], new_state[zero]
-            queue.append((''.join(new_state), path + [state]))
-    return None
-start = '123405678'
-''' 1 2 3    
-    4 0 5
-    6 7 8  '''
-
-solution = bfs(start)
-if solution:
-    print("steps to solve:")
-    for s in solution:
-        print(s[0:3])
-        print(s[3:6])
-        print(s[6:9])
-        print("-----")
-else:
-    print("no solution found.") 
-
-Q.4)] bfs
-Code:
-# bfs-- breadth first algorithm AI & ML
-import collections
-
-def bfs(graph, root):
-     visited , queue = set([root]), collections.deque([root])
-     while queue:
-         vertex = queue.popleft()
-         print(vertex)
-         for node in graph[vertex]:
-             if node not in visited:
-                 visited.add(node)
-                 queue.append(node)
-
-def all_path(start,end,graph):
-    todo= [(start,[start])]
-    while len(todo):
-        print(todo)
-        node , path =todo.pop(0)
-        for next_node in graph[node]:
-            print(todo) # to understand algorithm each steps and how it works
-            if next_node in path:
-                continue
-                print("ideal solution")
-            elif next_node == end:
-                yield path + [next_node]
-            else:
-                todo.append((next_node, path + [next_node]))
-
-def  bfs_shortest_path(graph, source , destination):
-    checked = []
-    queue = [[source]]
-    if source == destination:
-        return "SOURCE IS DESTINATION :"
-    while queue:
-        path = queue.pop(0)
-        node = path[-1]
-        if node not in checked:
-            neighbours = graph[node]
-            for neighbour in neighbours:
-                new_path = list(path)
-                new_path.append(neighbour)
-                queue.append(new_path)
-                if neighbour == destination:
-                    return new_path
-            checked.append(node)
-    return "PATH DOES NOT EXSIST :"
-
-graph = {
-    "A": ["B", "D"],
-    "B": ["C", "F"],
-    "C": ["E", "G","H"],
-    "G": ["E","H"],
-    "E": ["B", "F"],
-    "F": ["A"],
-    "D": ["F"],
-    "H": ["A"]
+class Parent extends Component{
+    render(){
+        return(
+            <div>
+                <h1>This is Parent Class {this.props.address}</h1>
+                <Child p_name = "Parent Age " p_age = {44}/>
+            </div>
+        )
+    }
 }
-print("Graph BFS traversal")
-bfs(graph, "A")
-print("ALL Paths")
-[print (x) for x in all_path("A", "F", graph)]
-a_path = all_path("A", "F", graph)
-print("SHOREST PATH OF THE GRAPH IS : ",bfs_shortest_path(graph, 'A' , 'F'))
-
-
-Q.5)   dfs
-Code: 
-# dfs-- depthh first algorithm AI & ML
-
-graph = {
-    "A": ["B", "D"],
-    "B": ["C", "F"],
-    "C": ["E", "G","H"],
-    "G": ["E","H"],
-    "E": ["B", "F"],
-    "F": ["A"],
-    "D": ["F"],
-    "H": ["A"]
+class Child extends Component{
+    render(){
+        return(
+            <div>
+                <h2>
+                    {this.props.p_name}{this.props.p_age}
+                </h2>
+            </div>
+        )
+    }
 }
+export {Parent,Child};
+function App() {
+  return (
+    <div className="App">
+      <Parent address ="Thane west"/>
+    </div>
+Q.2)
 
-def dfs(graph, root, end):
-    visited=[]
-    if root not in visited:
-        visited.append(root)
-        for i in graph[root]:
-            if visited[-1] is end:
-                break
-            dfs(graph, i , visited, end)
-    return visited
-
-print(dfs(graph, 'A', 'H'))
-
-Q.6)] greedy best first seach
-Code:
-graph = {
-    "A": ({"D":1},3),
-    "D": ({"B":3,"G":2},4),
-    "B": ({"C":2},2),
-    "C": ({"G":3},2),
-    "S": ({"A":2,"D":1,"E":3},6),
-    "E": ({"G":2},5),
-    "G": ({},0)
-}
-def greedy_search_rec(graph, prev,dst ,path,q):
-     print("Connected nodes of current node",prev,"with h(n) values:")
-     for n in graph[prev][0]:
-          if n not in path:
-               q[n]=graph[n][1]
-               print(n,"->",q[n])
-     while q:
-          mn=min(q, key = q.get)
-          q.pop(mn)
-          print("Taking minimum h(n) vertext: ", mn)
-          if dst == mn:
-               return path+ [dst]
-          new_path = greedy_search_rec(graph, mn, dst, path +[mn], q)
-          if new_path :
-               return new_path
-     return []
-
-source =input("enter source vetext: ").upper()
-dest = input("enter destination vetext: ").upper()
-path = greedy_search_rec(graph,source,dest,[source],{})
-if path:
-     print(path)
-else:
-     print("Path not found! ")
-
-
-
-Q.7)1)	Solve N-queen problem 
-Code:
-def solve(board, row, n):
-    if row == n:
-        for r in board:
-            print(" ".join(r))
-        print()
-        return True
-
-    for col in range(n):
-        safe = True
-
-        # Check column
-        for i in range(row):
-            if board[i][col] == "Q":
-                safe = False
-
-        # Check upper-left diagonal
-        i, j = row - 1, col - 1
-        while i >= 0 and j >= 0:
-            if board[i][j] == "Q":
-                safe = False
-            i -= 1
-            j -= 1
-
-        # Check upper-right diagonal
-        i, j = row - 1, col + 1
-        while i >= 0 and j < n:
-            if board[i][j] == "Q":
-                safe = False
-            i -= 1
-            j += 1
-
-        if safe:
-            board[row][col] = "Q"
-            if solve(board, row + 1, n):
-                return True
-            board[row][col] = "."
-    return False
-
-n = int(input("Enter N: "))
-board = [["." for _ in range(n)] for _ in range(n)]
-if not solve(board, 0, n):
-    print("No solution found")
-
-
-Q..8)2)	Solve Constraint satisfaction problems using Map coloring
-Code:
-   import itertools
-variables=["A","B","C"]
-colors=["Red","Blue","Yellow"]
-#All possible assignments
-all_assignments=itertools.product(colors,repeat=len(variables))
-
-def valid(i):
-    A, B, C = i
-    return(A!=B) and (B!=C) and (A!=C)
-
-solutions =[]
-for i in all_assignments:
-    if valid(i):
-        solutions.append(dict(zip(variables, i)))
-
-print("Valid colorings of the map:")
-for sol in solutions:
-    print(sol)
-
-Q.9)] tic-tac-toe
-Code:
-bd= [' ' for _ in range(9)]
-player= 'X'
-def show_board(): 
-    print(f'|{bd[0]}|{bd[1]}|{bd[2]}')
-    print("-----")
-    print(f'|{bd[3]}|{bd[4]}|{bd[5]}')
-    print("-----")
-    print(f'|{bd[6]}|{bd[7]}|{bd[8]}')
-
-def is_winner(p):
+export let Car = (props) =>{
     return(
-        (bd[0] == p and bd[1] == p and bd[2] == p) or (bd[3] == p and bd[4] == p and bd[5] == p) or
-        (bd[6] == p and bd[7] == p and bd[8] == p) or (bd[0] == p and bd[3] == p and bd[6] == p) or  
-        (bd[1] == p and bd[4] == p and bd[7] == p) or (bd[2] == p and bd[5] == p and bd[8] == p) or
-        (bd[0] == p and bd[4] == p and bd[8] == p) or (bd[2] == p and bd[4] == p and bd[6] == p))
-def is_tie():
-    return ' 'not in bd
-def game():
-    global player
-    while True:
-        show_board()
-        try:
-            move = int(input(f"{player} : turn(0-8)"))
-            if 0<=move<=8 and bd[move] == ' ':
-                bd[move] = player
-                if is_winner(player):
-                    show_board()
-                    print(f"{player} wins!!")
-                    break
-                elif is_tie():
-                    show_board()
-                    print("its a tie?")
-                    break
-                if player == 'X':
-                    player = 'O'
-                else:
-                    player = 'X'
-            else:
-                print("invalid move")
-        except(ValueError,IndexError):
-            print("invalid input")        
-game()
-
-
-Q.10)] min-max (alpha-beta pruning) 
-Code: 
-tree = {'A':['B','C'],'B':['D','E'],'C':['F','G'],
-        'D':[4,3],
-        'E':[6,2],
-        'F':[2,1],
-        'G':[9,5]}
-def minmax_alpha_beta(node, depth, alpha, beta, max_player):
-    if depth == 0:
-        if node in tree:
-            return tree[node][0] if max_player else tree[node][0]
-        else:
-            return node
-    if max_player:
-        value=float('-inf')
-        for child in tree[node]:
-            value=max(value,minmax_alpha_beta(child,depth-1,alpha, beta,False))
-            alpha=max(alpha,value)
-            if alpha>=beta:
-                print(f'Pruning branch at node{node}')
-                break
-        return value
-    else:
-        value=float('inf')
-        for child in tree[node]:
-            value=min(value,minmax_alpha_beta(child,depth-1,alpha, beta, True))
-            beta=min(beta,value)
-            if alpha>=beta:
-                print(f'Pruning branch at node{node}')
-                break
-        return value
-best_score = minmax_alpha_beta('A',2,float('-inf'),float('inf'),True)
-print(f"The best score is : {best_score}")
-        
-q.11)Shuffle Deck of Cards 
-Code: 
-import random
-deck = [rank + " of " + suit for suit in ['hearts', 'spades', 'clubs', 'diamonds']
-        for rank in ['A','2','3','4','5','6','7','8','9','10','J','Q','K']]
-random.shuffle(deck)
-print(deck)
-
-
-Q.12)cannibal and missionaries
-from collections import deque
-
-def bfs():
-    start = (3, 3, 0)
-    goal = (0, 0, 1)
-
-    moves = [(1,0), (2,0), (0,1), (0,2), (1,1)]
-
-    def valid(m, c):
-        if m < 0 or c < 0 or m > 3 or c > 3:
-            return False
-
-        if m > 0 and c > m:
-            return False
-
-        mr, cr = 3-m, 3-c
-
-        if mr > 0 and cr > mr:
-            return False
-
-        return True
-
-    queue = deque([(start, [])])
-    visited = set()
-
-    while queue:
-        state, path = queue.popleft()
-
-        if state in visited:
-            continue
-
-        visited.add(state)
-        path = path + [state]
-
-        if state == goal:
-            return path
-
-        m, c, boat = state
-
-        for dm, dc in moves:
-            if boat == 0:
-                new = (m-dm, c-dc, 1)
-            else:
-                new = (m+dm, c+dc, 0)
-
-            if valid(new[0], new[1]):
-                queue.append((new, path))
-
-
-solution = bfs()
-
-for i, state in enumerate(solution):
-    print("Step", i, ":", state)
-
-
-Q.13)decision tree classifier
-import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from matplotlib import pyplot as plt
-from sklearn import tree
-
-col_names = ['Reservation', 'Raining', 'BadService', 'Satur','Result']
-hoteldata = pd.read_csv('data.csv',header=None,names=col_names)
-hoteldata = hoteldata.dropna()
-feature_cols = ['Reservation', 'Raining', 'BadService', 'Satur']
-X = hoteldata[feature_cols]
-Y = hoteldata['Result']
-
-# Split data into training and testing
-X_train, x_test, Y_train, y_test = train_test_split(X,Y,test_size=0.3,random_state=1)
-print("Hotel Data:",print("\nX Train data:"),X_train)
-print("\nY Train data:",Y_train)
-print("\nX Test data:",x_test)
-print("\nY Test data:",y_test)
-
-# Create Decision Tree
-clif = DecisionTreeClassifier(criterion="entropy",max_depth=5)
-# Train model
-clif = clif.fit(X_train, Y_train)
-y_pred = clif.predict(x_test)
-print("\nActual Y Test:",y_test.values)
-print("\nPredicted Y:",y_pred)
-accuracy = metrics.accuracy_score(y_test, y_pred)
-print("\nAccuracy:", accuracy)
-
-# Draw Decision Tree
-fig = plt.figure(figsize=(25, 20))
-tree.plot_tree(clif,feature_names=feature_cols,class_names=['leave','wait'],filled=True)
-fig.savefig("decision-tree-img.png")
-plt.show()
-
-
-Q.14)naives bayes thereom
-import pandas as pd
-from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from matplotlib import pyplot as plt
-from sklearn import tree
-
-col_names = ['Reservation', 'Raining', 'BadService', 'Satur', 'Result']
-# Read CSV file
-hoteldata = pd.read_csv('data.csv',header=None,names=col_names)
-hoteldata = hoteldata.dropna()
-feature_cols = ['Reservation', 'Raining', 'BadService', 'Satur']
-
-X = hoteldata[feature_cols]
-Y = hoteldata['Result']
-
-# Split data into training and testing
-X_train, x_test, Y_train, y_test = train_test_split(X,Y,test_size=0.3,random_state=1)
-
-# Display data
-print("Hotel Data:")
-print(hoteldata)
-print("\nX Train data:")
-print(X_train)
-print("\nY Train data:")
-print(Y_train)
-print("\nX Test data:")
-print(x_test)
-print("\nY Test data:")
-print(y_test)
-
-# Create Decision Tree
-clif = GaussianNB()
-clif = clif.fit(X_train, Y_train)
-y_pred = clif.predict(x_test)
-
-print("\nActual Y Test:")
-print(y_test.values)
-print("\nPredicted Y:")
-print(y_pred)
-
-# Accuracy
-accuracy = metrics.accuracy_score(y_test, y_pred)
-print("\nAccuracy:", accuracy)
-
-# Classification report
-print(metrics.classification_report(y_test,y_pred,zero_division=0))
-
-
-Q.15)Code:
-# KNN
-import pandas as pd
-import matplotlib.pyplot as pyplot
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, accuracy_score
-import seaborn as sn
-
-# Load CSV
-iris = pd.read_csv("data.csv")
-
-# Input features - 4 columns
-X = iris[
-    ["SepalLenCm", "SepalWidCm", "PetalLenCm", "PetalWidCm"]
-]
-
-# Target - Species
-Y = iris["Species"]
-
-# Split data
-X_train, x_test, Y_train, y_test = train_test_split(
-    X, Y,
-    test_size=0.3,
-    random_state=1,
-    stratify=Y
-)
-
-# Create KNN model
-knn = KNeighborsClassifier(n_neighbors=5)
-
-# Train model
-train = knn.fit(X_train, Y_train)
-
-# Test data
-print("Size of test data:", len(x_test))
-print("X values of test data:")
-print(x_test)
-
-print("Y values of test data:")
-print(y_test)
-
-# Prediction
-print("Predicted Classes for testing data:")
-y_predict = train.predict(x_test)
-
-print(y_predict)
-
-# Accuracy
-print("Accuracy of the model:")
-print(knn.score(x_test, y_test))
-
-# Confusion matrix
-print("Confusion matrix of model:")
-
-cm = confusion_matrix(y_test, y_predict)
-
-print(cm)
-
-# Heatmap
-pyplot.figure(figsize=(7, 5))
-
-sn.heatmap(
-    cm,
-    annot=True,
-    fmt="d",
-    xticklabels=knn.classes_,
-    yticklabels=knn.classes_
-)
-
-pyplot.xlabel("Predicted")
-pyplot.ylabel("Truth")
-pyplot.show()
-
-
-
-Q.16)# SVM with Scatter Plot
-
-import pandas as pd
-import matplotlib.pyplot as pyplot
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-from sklearn.metrics import confusion_matrix, accuracy_score
-import seaborn as sn
-
-# Load CSV
-iris = pd.read_csv("data.csv")
-
-# Remove empty rows
-iris = iris.dropna()
-
-# Input features - 4 columns
-X = iris[
-    ["SepalLenCm", "SepalWidCm", "PetalLenCm", "PetalWidCm"]
-]
-
-# Target - Species
-Y = iris["Species"]
-
-# Split data
-X_train, x_test, Y_train, y_test = train_test_split(
-    X,
-    Y,
-    test_size=0.3,
-    random_state=1,
-    stratify=Y
-)
-
-# Create SVM model
-svm = SVC(kernel="linear")
-
-# Train model
-svm.fit(X_train, Y_train)
-
-# Test data
-print("Size of test data:", len(x_test))
-
-print("X values of test data:")
-print(x_test)
-
-print("Y values of test data:")
-print(y_test)
-
-# Prediction
-print("Predicted Classes for testing data:")
-y_predict = svm.predict(x_test)
-
-print(y_predict)
-
-# Accuracy
-accuracy = accuracy_score(y_test, y_predict)
-
-print("Accuracy of the model:")
-print(accuracy)
-
-print("Accuracy percentage:")
-print(accuracy * 100, "%")
-
-# Confusion matrix
-print("Confusion matrix of model:")
-
-cm = confusion_matrix(y_test, y_predict)
-
-print(cm)
-# Plot each class with different colors
-for species in iris["Species"].unique():
-
-    data = iris[iris["Species"] == species]
-
-    pyplot.scatter(
-        data["PetalLenCm"],
-        data["PetalWidCm"],
-        label=species,
-        s=60
+        <h2> I am a {props.name}!!</h2>
     )
+}
+export const Product = () =>{
+    return(
+        <div>
+            <h1>Product details</h1>
+            <Car name= "Nothing CMF 2 PRO"/>
+        </div>
+    )
+}
+function App() {
+  return (
+    <div className="App">
+      <Product/>
+    </div>
+  );
+}
+export default App;
 
-pyplot.xlabel("Petal Length (cm)")
-pyplot.ylabel("Petal Width (cm)")
-pyplot.title("SVM - Iris Dataset Scatter Plot")
-pyplot.legend()
-pyplot.grid(True)
-pyplot.show()
+Q.3)
+Class_state………….
+
+import React from "react"
+import { Component } from "react"
+
+class Message extends Component{
+    constructor(){
+        super()
+        this.state = {
+            message : "Welcome Visitors"
+        }
+    }
+    render(){
+        return(
+            <div>
+                <h1>{this.state.message}</h1>
+                <button onClick={()=> this.changeMessage()}>CLick here!!</button>
+            </div>
+        )}
+    changeMessage(){
+        this.setState(
+            {
+                message:"Thank You for Visiting!"
+            }
+        )}
+}
+export default Message;
+function App() {
+  return (
+    <div className="App">
+      <h2>Class State Method</h2>
+
+Q.4)
+class Counter1 extends Component{
+    constructor(){
+        super()
+        this.state = {
+            count: 0
+        }
+    }
+    increment(){
+        this.setState((prevState)=>({
+            count: prevState.count + 1
+            })
+        )
+        console.log(this.state.count)
+    }
+    render(){
+        return(
+            <div>
+                <h1>{this.state.count}</h1>
+                <button onClick={()=> this.increment()}>
+                    Increment Now!!
+                </button>
+            </div>
+        )
+    }
+}
+export default Counter1
+function App() {
+  return (
+    <div className="App">
+      <h2>Class State Method</h2>
+      <Message/>
+      <Counter1/>
+    </div>
+  );
+}
+
+Q.5)
+Perform File Operations In Node.js
+i)  Reading a File
+
+1.Reading contents of file in synchronous way.
+Code: 
+Read.js
+const fs=require("fs")
+const a=fs.readFileSync('./sample.txt',"utf-8")
+console.log(a)
+
+Q.6)
+.Reading Content of File In Asynchronous way.
+Code:
+         Async.js
+const fs = require("fs");
+fs.readFile("./sample.txt", "utf-8", (error, data) => {
+    if (error) {
+        throw new Error("Error reading file!");
+    }
+    console.log(data);
+});
+
+Q.7)
+const fs = require("fs/promises");
+async function readFileContent() {
+    try {
+        const data = await fs.readFile("./example.txt", "utf-8");
+        console.log(data);
+    } catch (error) {
+        console.error("Error reading file!");
+    }
+}
+readFileContent();
+
+Q.8)
+const fs = require('fs/promises')
+const writeFunct = async () =>{
+    try{
+        const d = await fs.readFile('write.txt', 'utf-8');
+        console.log(d)
+        await fs.writeFile('write.txt','Writing in the file','utf-8')
+        await fs.appendFile('write.txt','\nData append via Node.js',"utf-8")
+        await fs.rename('write.txt','new_write.txt')
+        const data = await fs.readFile('new_write.txt','utf-8')
+        console.log(data)
+    }
+    catch(err){
+        throw err
+    }
+}
+writeFunct()
+
+Q.9)
+: Create a Node.js module that allows user to input text via the command line. Once the user enter the text, the program should save the input into a file named text.txt. Additionally, the program should emit a custom event indicating that the text is ready for processing.
+
+Code:
+const fs = require('fs');
+const readline = require('readline');
+const EventEmitter = require('events');
+const eventEmiter =  new EventEmitter();
+const rl = readline.createInterface(
+    {
+    input: process.stdin,
+    output: process.stdout
+    }
+);
+function handleInput(input){
+    eventEmiter.emit('textReady',input);
+}
+eventEmiter.on('textReady',(text)=>{
+    console.log(`Custom event fired: Text is Ready - ${text}`);
+    fs.writeFile('text.txt',text,(err)=>{
+        if(err) throw err;
+        console.log('Text has been saved to text.txt');
+        rl.close();
+    });
+});
+rl.question('Enter some text :',(text) =>{
+    handleInput(text);
+
+Q.10)
+)For Fibonacci Series
+Code:
+const readline = require('readline');
+const EventEmitter = require('events');
+const eventEmitter = new EventEmitter();
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+// Function to emit event
+function handleInput(num) {
+    eventEmitter.emit('fibonacciReady', num);
+}
+// Event Listener
+eventEmitter.on('fibonacciReady', (num) => {
+    let a = 0, b = 1;
+    console.log("Fibonacci Series:");
+    for (let i = 0; i < num; i++) {
+        console.log(a);
+        let next = a + b;
+        a = b;
+        b = next;
+    }
+    rl.close();
+});
+// Take input
+rl.question("Enter the number of terms: ", (input) => {
+    handleInput(parseInt(input));
+});
+
+Q.11)
+
+const { error } = require('console');
+const http = require('http');
+const hostname = '127.0.0.1';
+const port = 4000;
+const server = http.createServer((req, res) => {
+    res.writeHead(200,{'Content-Type':'text/plain'});
+    if (req.url === '/hello'){
+        res.end('Hello World\n');
+    }else if (req.url === '/about'){
+        res.end('this is about page.\n');
+    }else{
+        res.end('Node.js server!!\n');
+    }
+});
+server.listen(4000,'127.0.0.1' ,() => {
+    console.log('Server running at http://${hostname}:${port}/')
+});
+
+Q.12)
+
+const fs = require('fs');
+const port = 8000
+const express = require('express');
+const app = express();
+let users = JSON.parse(fs.readFileSync('users.json'));
+app.get('/api/v1/users',(req,res)=>{
+    res.json(users);
+});
+app.get('/api/v1/users/:id',(req,res)=>{
+    let id = req.params.id*1;
+    const find_user = users.find(ele =>ele.id == id)
+    res.stsstus(200).json(find_user)
+    if (!find_user){
+        return res.status(404).json({"status":"FAILED","message":"could not find he user"}
+    )}
+    res.stattus(200).json*(find_user);
+})
+app.listen(port,()=>{console.log("server is listemning")});
+
+users.json
+[
+    {"id":"101","name":"Alice","age":23},
+    {"id":"102","name":"Preetam","age":20},
+    {"id":"103","name":"Ganesh","age":19},
+    {"id":"104","name":"Piyush","age":21},
+    {"id":"105","name":"Mayur","age":19}
+]
+
+Q.13)
+
+const fs = require('fs');
+const port = 8000
+const express = require('express');
+const app = express();
+let user = JSON.parse(fs.readFileSync('users.json'));
+app.get('/api/v1/users',(req,res)=>{
+    res.json(user);
+});
+app.patch('/api/v1/users/:id',(req,res)=>{
+    let id = req.params.id*1;
+    const user = JSON.parse(fs.readFileSync('users.json'));
+    const updatedUsers = user.map(user =>{
+        if(user.id === id){
+            user.name='Ram';
+        }
+        return user;
+    });
+    fs.writeFileSync('users.json',JSON.stringify(updatedUsers,null,id));
+    res.json({message:`USER with id: ${id} updates sucessfully`})    
+})
+app.listen(port,()=>{console.log("server is listening")});
+
+users.json
+[
+    {"id":"101","name":"Alice","age":23},
+    {"id":"102","name":"Preetam","age":20},
+    {"id":"103","name":"Ganesh","age":19},
+    {"id":"104","name":"Piyush","age":21},
+    {"id":"105","name":"Mayur","age":19}
+]
+
+
+Q.14)
+. Connect nodejs with MongoDB
+Code:Connect.js
+const { MongoClient } = require("mongodb") ;
+const MONGO_URI = "mongodb://localhost:27017/"
+const DB_NAME = 'mydb'
+
+async function main(params) {
+    const client = new MongoClient(MONGO_URI)
+    try {
+        await client.connect()
+        console.log(`Connected to the MongoDB Database`)
+        const db = client.db(DB_NAME)
+        console.log(`Database ${DB_NAME} created`)
+        const collectionName = 'myCollection'
+        const collection = db.collection(collectionName)
+         console.log(`Collection ${collectionName} created`)
+        const data = [
+            {"name": "Alice","age": 25},
+            {"name": "Bob","age": 30},
+            {"name": "Charlie","age": 28}]
+
+        const result = await collection.insertMany(data)
+        console.log(`${result.insertedCount} documents inserted`)
+    } catch (error) {
+        console.log(error)
+    }finally{
+        await client.close()
+        console.log('connection closed')
+    }
+}
+main().catch(console.error)
+
+Q.15)
+
+import React  from "react";
+import { useState } from "react";
+function MultipleValueArr(){
+    const friendArr = ["Earth" , "Bright" , "Jeff" , "Mew"]
+    const [friends , setFriends] = useState(friendArr)
+    const handleFunction = ()=>{
+        const newFriend = document.getElementById('friend').value
+        setFriends([...friends,newFriend])
+    }
+    return(
+        <div>
+            <h1>List</h1>
+          <ul>
+                {friends.map((friend, index) => (
+                    <li key={index}>{friend}</li>
+                ))}
+            </ul>
+            <input type="text" id="friend" placeholder="Enter Friend name"/>
+            <button onClick={handleFunction}>Add Friend</button>
+        </div>
+    )
+}
+export default MultipleValueArr
+
+
+Q.16)
+import React,{useState} from "react";
+function AddRemoveArr(){
+    const [users, setUsers] = useState([
+        {id:1, username:"User1"},
+        {id:2, username:"User2"}
+    ])
+    const addUser=()=>{
+        const newUser={
+            id:`${users.length+1}`,
+            username:`User${users.length+1}`
+        };
+        const newUsers=[...users,newUser];
+        console.log(newUsers);
+        setUsers(newUsers);
+    };
+    const removeUser =(index)=>()=>{
+        const newUsers = [...users];
+        console.log(newUsers);
+        newUsers.splice(index,1);
+        setUsers(newUsers);
+    };
+    const addAfter =(index) => () => {
+        const newUser={
+            id:`${users.length+1}`,
+            username:`User${users.length+1}`
+        };
+        const newUsers =[...users];
+        newUsers.splice(index + 1,0, newUser)
+        console.log(newUsers)
+        setUsers(newUsers);
+    };
+    return(
+        <>
+        <button onClick={addUser}>Add User</button>
+        {users.map((user,index)=>(
+            <div className="user" key={user.id}>
+                {user.username}
+                <button onClick={removeUser(index)}>Remove User</button>
+                <button onClick={addAfter(index)}>Add immediate nextUser</button>
+            </div>
+        ))}
+        </>
+    );
+
+Q.17)
+
+1) Create counter using useState Hook -- (built-in fuction)
+
+pr7q1.js
+import React,{useState} from "react";
+const Count1 = () => {
+    const[count,setCount] = useState(0);
+    return(
+        <div>
+            <p>You clicked {count} times</p>
+            <button onClick={()=> setCount(count + 1)}>
+                Click me!
+            </button>
+        </div>
+    )
+}
+export default Count1;
+
+App.js
+import Count1 from './pr7q1';
+function App() {
+  return (
+    <div className="App">
+      <Count1/>
+    </div>
+  );
+}
+export default App;
+
+Q.18)
+
+pr7q1.js
+import { useReducer } from "react";
+const initial_state=0;
+const reducer = (state,action) =>{
+    switch (action) {
+        case "add":
+            return state +1 ;
+        case "subtract":
+            return state -1;
+        case "reset":
+            return 0;
+        default:
+            throw new Error("Error");
+    }
+}
+const Arithmetic = () =>{
+    const[count,dispatch]=useReducer(reducer,initial_state);
+    return(
+        <div>
+            <h2>{count}</h2>    
+            <button onClick={()=> dispatch("add")}>
+                Increment Me!!
+            </button>&nbsp;&nbsp;
+            <button onClick={()=> dispatch("subtract")}>
+                Decrement !!
+            </button>&nbsp;&nbsp;
+            <button onClick={()=> dispatch("reset")}>
+                Reset ! 
+            </button>
+        </div>
+    )
+}
+export default Arithmetic;
+
+App.js
+import Arithmetic from './pr7q2';
+function App() {
+  return (
+    <div className="App">
+      <Arithmetic/>
+    </div>
+  );
+}
+export default App;
+
+Q.19)
+
+) Write a React component using the useReducer hook where the initial state is a string "Hello". Create a reducer that handles three actions: "welcome", "goodbye", and "reset". Display the current text on the screen and provide three buttons to dispatch these actions.
+Code:
+
+pr7q3.js
+import { useReducer } from "react";
+const initialState = "Hello";
+const reducer = (state, action) => {
+  switch (action) {
+    case "welcome":
+      return "Welcome";
+    case "goodbye":
+      return "Good Bye";
+    case "reset":
+      return initialState;
+    default:
+      throw new Error("Error");
+  }
+};
+const TextChange = () => {
+  const [text, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <div>
+      <h2>{text}</h2>
+      <button onClick={() => dispatch("welcome")}>
+        Welcome
+      </button>
+      <button onClick={() => dispatch("goodbye")}>
+        Good Bye
+      </button>
+      <button onClick={() => dispatch("reset")}>
+        Reset
+      </button>
+    </div>
+  );
+};
+export default TextChange;
+
+App.js
+import './App.css';
+import TextChange from './pr7q3.js';
+import Person from './pr7q3.js';
+function App() {
+  return (
+    <div className='App'>
+      <TextChange/>
+    </div>
+  );
+}
+export default App
+
+Q.20)
+
+ App.js
+import './App.css';
+import P8q1 from './pr8q1';
+function App() {
+  return(
+    <P8q1/>
+    <P8q2/>
+    <P8q3/>
+  )
+}
+export default App;
+
+pr8q1.js
+import React, { useEffect, useState } from "react";
+function P8q1(){
+    const[posts,setPosts] = useState([]);
+    useEffect(()=> {
+        const fetchData = async()=>{
+            const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+            const data = await response.json();
+            setPosts(data);
+        };
+        fetchData();
+    },[]);
+    return(
+        <div>
+            {posts.map((post)=>(
+            <div key={post.id}>
+                Post Id: {post.id}<br></br>
+                Title : <h3>{post.title}</h3>
+                Body:<p>{post.body}</p>
+            </div>
+            ))}
+        </div>
+    );
+}
+export default P8q1
+
+Q.21)
+pr8q2.js
+    import React, { Component,useContext,useState,} from "react";
+    const employeeContext = React.createContext();
+    function P8q2(){
+        const[employee,setEmployee]=useState({id:101,name:'Gita',
+  location:"Thane",salary:12345});
+        return(
+            <div>
+                <h2>Welcome to parent component...</h2>
+                <employeeContext.Provider value={employee}>
+                    <Employee/>
+                </employeeContext.Provider>
+            </div>
+        )
+    }
+    function Employee(){
+        const context = useContext(employeeContext);
+        return(
+            <div>
+                <h3>Welcome to employee component</h3>
+                <p>
+                    Employee ID: <b>{context.id}</b>
+                    Employee Name: <b>{context.name}</b>
+                </p>
+                <Salary/>
+            </div>
+        )
+    }
+    function Salary(){
+        const context = useContext(employeeContext);
+        return(
+            <div>
+                <h3>Welcome to salary component</h3>
+                <p>
+                    Employee Salary: <b>{context.salary}</b>
+                </p>
+            </div>
+        );
+    }export default P8q2;
+
+Q.22)
+
+import React, { Component,useContext,useState,} from "react";
+const employeeContext = React.createContext();
+function P8q3(){
+    const[employee,setEmployee]=
+useState({id:101,name:'Gita',location:"Thane",salary:12345});
+    return(
+        <div>
+            <h2>Welcome to parent component...</h2>
+            <employeeContext.Provider value={employee}>
+                <Component1/>
+            </employeeContext.Provider>
+        </div>
+    )}
+    function Component1(){
+        return(
+            
+            <div>
+                <h3>Component1 has child component2</h3>
+                <Component2/>
+            </div>
+    )}
+    function Component2(){
+        return(
+            <div>
+                <h3>Component2 has child component3</h3>
+                <Component3/>
+            </div>
+    )}
+    function Component3(){
+        const context = useContext(employeeContext)
+        return(
+            <div>
+                <h3>Welcome to component3</h3>
+                <p>
+                    Employee ID: <b>{context.id}</b>
+                    Employee Name: <b>{context.name}</b>
+                </p>
+            </div>
+        )
+    }export default P8q3;
+
+Q.23)
+
+App.js
+	import './App.css';
+import Header from './pr9q1';
+import Unmount from './pr9q2';
+function App() {
+  return(
+    <div>
+      <Header/><Unmount/>
+    </div>
+  )}export default App;
+pr9q1.js
+import React from "react";
+class Header extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {favcolor:"red"};
+    }
+    componentDidMount(){
+        setTimeout(() =>{
+            this.setState({favcolor:"blue"})
+        },5000)
+    }
+    getSnapshotBeforeUpdate(prevProps, prevState){
+        document.getElementById("div1").innerHTML = "Before the update , 			favcolor was "+prevState.favcolor;
+    }
+    componentDidUpdate(){
+        document.getElementById("div2").innerHTML = "The updated favcolor is "		+this.state.favcolor;
+    }
+    render(){
+        return(
+            <section>
+                <h2>This is Practical 9 question 1 {this.state.favcolor}</h2>
+                <div id="div1">
+                </div>
+                <div id="div2"></div>
+            </section>
+        )
+    }
+}
+export default Header;
+
+Q.24)
+
+pr9q2.js
+import React from "react";
+class Unmount extends React.Component{
+    constructor(){
+        super();
+        this.state={
+            delete:false,
+        };
+    }
+    render(){
+        return(
+            <div>
+                <h1>User List</h1>
+                <button onClick={()=>this.setState({delete:!this.state.delete})}>Delete Users</button>
+                {this.state.delete?null:<User/>}
+            </div>
+        )
+    }
+}
+class User extends React.Component{
+    componentWillUnmount(){
+        alert('delete user sucessfully!');
+    }
+    render(){
+        return(
+            <div>
+                Mulund College of Commerece (Autonomous)2026-27
+                <h3>UserName: dummy</h3>
+                <h3>Email: dummy@gmail.com</h3>
+            </div>
+        )
+    }
+}
+export default Unmount;
+
+
+Q.25)
+ App.js
+import './App.css';
+import Home from './home';
+import About from './about';
+import Contact from './contact';
+import { BrowserRouter, Route, Routes,Link } from 'react-router-dom';
+
+function App() {
+  return(
+    <BrowserRouter>
+      <nav>
+        <Link to="/">Home</Link>|{""}
+        <Link to="/about">About</Link>|{""}
+        <Link to="/contact">Contact</Link>|{""}
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/about" element={<About/>}/>
+        <Route path="/contact" element={<Contact/>}/>
+      </Routes>
+    </BrowserRouter>
+    
+  )
+}
+export default App;
+Home.js
+import './App.css';
+function Home() {
+  return (
+    <section id="home" >
+        <div>
+            <p>It is the home page of Route practical
+                here we have the home route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default Home;
+
+About.js
+import './App.css';
+function About() {
+  return (
+    <section id="about">
+        <div>
+            <p>It is the About page of Route practical
+                here we have the About route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default About;
+
+Contact.js
+import './App.css';
+function Contact() {
+  return (
+    <section id="contact">
+        <div>
+            <p>It is the Contact page of Route practical
+                here we have the Contact route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default Contact;
+
+
+Q.26)
+App.js
+import './App.css';
+import Home from './home';
+import About from './about';
+import Contact from './contact';
+import Product from './products';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
+import Navbar from './Navbar';
+function App() {
+  return(
+    <BrowserRouter>
+      <Navbar/>
+      
+<Routes>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/about" element={<About/>}/>
+        <Route path="/product" element={<Product/>}/>
+        <Route path="/contact" element={<Contact/>}/>
+      </Routes>
+    </BrowserRouter>
+    
+  )
+}
+export default App;
+
+Navbar.js
+import { NavLink } from "react-router-dom";
+function Navbar(){
+    return(
+        <nav>
+            <NavLink to="/" className={({isActive})=>isActive ? "active":""}>Home</NavLink>
+            <NavLink to="/about" className={({isActive})=>isActive ? "active":""}>About</NavLink>
+            <NavLink to="/product" className={({isActive})=>isActive ? "active":""}>Products</NavLink>
+            <NavLink to="/contact" className={({isActive})=>isActive ? "active":""}>Contact</NavLink>
+        </nav>
+    )
+}
+export default Navbar;
+
+Products.js
+import './App.css';
+function Product() {
+  return (
+    <section id="product">
+        <div>
+            <p>It is the Product page of Route practical
+                here we have the Product route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default Product;
+
+
+Q.27)
+App.js
+import './App.css';
+import Product from './products';
+import FeatureProducts from './featureproduct';
+import NewProducts from './newproducts';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
+import Navbar from './Navbar';
+function App() {
+  return(
+    <BrowserRouter>
+      <Navbar/>
+      <Routes>
+        <Route path="/product" element={<Product/>}>
+          <Route path="featured" element={<FeatureProducts/>}/>
+          <Route path="new" element={<NewProducts/>}/>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+    
+  )
+}
+
+export default App;
+
+featureproduct.js
+import './App.css';
+function FeatureProduct() {
+  return (
+    <section id="features">
+        <div>
+            <p>It is the FeatureProduct page of Route practical
+                here we have the FeatureProduct route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default FeatureProduct;
+
+newproduct.js
+import './App.css';
+function NewProduct() {
+  return (
+    <section id="newProduct">
+        <div>
+            <p>It is the NewProduct page of Route practical
+                here we have the NewProduct route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default NewProduct;
+
+Products.js
+import './App.css';
+import { Link, Outlet } from 'react-router-dom';
+
+const Product = () => {
+  return (
+    <div>
+      <p>
+        It is the Product page of Route practical.
+        We use the -outlet- method here.
+      </p>
+      <input type="search" placeholder="Search Products" />
+      <nav>
+        <Link to="/product/featured">Featured</Link>
+        <Link to="/product/new">New</Link>
+      </nav>
+      <Outlet />
+    </div>
+  );
+};
+export default Product;
+
+Q.30)
+
+ App.js
+import './App.css';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
+import Notfound  from './notfound';
+function App() {
+  return(
+    <BrowserRouter>
+      <Routes>
+        <Route path='/*' element={<Notfound/>}/>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+export default App;
+
+featureproduct.js
+import './App.css';
+function FeatureProduct() {
+  return (
+    <section id="features">
+        <div>
+            <p>It is the FeatureProduct page of Route practical
+                here we have the FeatureProduct route.
+            </p>
+        </div>
+    </section>
+  );
+}
+export default FeatureProduct;
+
+notfound.js
+import './App.css';
+const Notfound = () => {
+  return (
+    <div>
+      <h1>Error 404 : Page not found</h1>
+    </div>
+  );
+};
+export default Notfound;
+
 
 
 
