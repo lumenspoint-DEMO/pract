@@ -16,5 +16,4 @@ foreach ($f in $list) {
     }
 }
 
-Write-Host "Done! Opening folder..."
-Invoke-Item $dest
+Write-Host "Done! Files saved to: $dest"
