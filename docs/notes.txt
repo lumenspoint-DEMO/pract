@@ -1,1574 +1,734 @@
-MONGODB PRACTICAL NO. 01
-AIM: Perform MongoDB CRUD Operations
+#PRAC1
+#Implement an inverted index construction algorithm (Posting Method). Build a simple document retrieval system using constructed index
+def get_documents():
+    n = int(input("Enter the number of documents: "))
+    documents = {}
+    for i in range(n):
+        doc = input(f"Enter Document {i + 1}: ").lower().split()
+        documents[i + 1] = doc
+    return documents
+def build_index(documents):
+    term_docs = []
 
-We can do it step-by-step in MongoDB Compass or mongosh.
+    for doc_id, terms in documents.items():
+        for term in terms:
+            term_docs.append((term, doc_id))
 
-========================================
-1. START MONGODB
-========================================
+    print("\nSTEP 1: Term and Document ID")
+    for term, doc_id in term_docs:
+        print(term, "\t", doc_id)
 
-If you are using MongoDB Compass:
+    term_docs.sort()
+
+    print("\nSTEP 2: Arranged Term and Document ID")
+    for term, doc_id in term_docs:
+        print(term, "\t", doc_id)
+
+    posting_lists = {}
+    for term, doc_id in term_docs:
+        posting_lists.setdefault(term, set()).add(doc_id)
+
+    print("\nSTEP 3: Term and Document Frequency")
+    for term in sorted(posting_lists):
+        print(f"{term}\t{len(posting_lists[term])}")
+
+    print("\nSTEP 4: Posting Lists")
+    for term in sorted(posting_lists):
+        print(f"{term} -> {sorted(posting_lists[term])}")
+
+    return posting_lists
 
-1. Open MongoDB Compass.
-2. Connect to:
-   mongodb://localhost:27017
-3. Open the Mongosh terminal inside Compass, or open Command Prompt and type:
 
-   mongosh
+documents = get_documents()
+build_index(documents)
+#input
+#Enter the number of documents: 2
+#Enter Document 1: this is information retrieval subject
+#Enter Document 2: this subject is for third year computer science students
+
+#PRAC 2A
+#Implement the Boolean retrieval model and process queries.
+def accept_docs():
+    num_of_docs = int(input("Enter no. of docs: "))
+    docs = []
+
+    for i in range(1, num_of_docs + 1):
+        doc = input(f"Enter the content of doc{i}: ").lower().split()
+        docs.append(doc)
+
+    print("ALL Documents:", docs)
+
+    full_doc = []
+    for doc in docs:
+        full_doc.extend(doc)
 
-If the Compass connection fails, check the MongoDB services.
+    full_terms = list(dict.fromkeys(full_doc))
+    return docs, full_terms
 
-========================================
-PART A - CREATE DATABASE AND COLLECTION
-========================================
 
-Q1. Create database emp_db
+def print_incident_matrix(docs, full_terms):
+    matrix = {}
+
+    for term in full_terms:
+        vector = [1 if term in doc else 0 for doc in docs]
+        matrix[term] = vector
+
+    return matrix
 
-In mongosh, type:
-
-use emp_db
-
-Expected:
-
-switched to db emp_db
-
-MongoDB creates the database when you first store data in it.
-
-Q2. Create employee collection
-
-db.createCollection("employee")
-
-Expected:
-
-{ ok: 1 }
-
-========================================
-PART B - INSERT EMPLOYEES
-========================================
-
-Q3. Insert one employee
-
-db.employee.insertOne({
-    employee_id: 101,
-    name: "John Doe",
-    department: "IT",
-    salary: 70000
-})
-
-Q4. Insert multiple employees
-
-db.employee.insertMany([
-    {
-        employee_id: 102,
-        name: "Jane Doe",
-        department: "HR",
-        salary: 55000
-    },
-    {
-        employee_id: 103,
-        name: "Alex Roy",
-        department: "Sales",
-        salary: 60000
-    }
-])
-
-Q5. Insert employee with skills array
-
-db.employee.insertOne({
-    employee_id: 104,
-    name: "Priya Sharma",
-    department: "Development",
-    salary: 75000,
-    skills: ["MongoDB", "Node.js", "React"]
-})
-
-Q6. Insert employee with nested address
-
-db.employee.insertOne({
-    employee_id: 105,
-    name: "Ravi Kumar",
-    department: "Design",
-    salary: 50000,
-    address: {
-        street: "MG Road",
-        city: "Pune",
-        zipcode: 411001
-    }
-})
-
-========================================
-PART C - DISPLAY AND SEARCH
-========================================
-
-Q7. Display all employees
-
-db.employee.find()
-
-For cleaner output:
-
-db.employee.find().pretty()
-
-Q8. Employees in IT
-
-db.employee.find({
-    department: "IT"
-})
-
-Q9. Employees with salary greater than 60000
-
-db.employee.find({
-    salary: { $gt: 60000 }
-})
-
-Q10. Employees having Python skill
-
-db.employee.find({
-    skills: "Python"
-})
-
-Note:
-With the employees currently inserted from the practical, nobody has
-"Python" yet, so this may return no documents. The query itself is correct.
-
-Q11. Employees living in Pune
-
-Because city is inside the address object:
-
-db.employee.find({
-    "address.city": "Pune"
-})
-
-========================================
-PART D - CONDITIONAL OPERATORS
-========================================
-
-Q12. Salary between 50000 and 80000
-
-db.employee.find({
-    salary: {
-        $gte: 50000,
-        $lte: 80000
-    }
-})
-
-$gte means greater than or equal to.
-$lte means less than or equal to.
-
-Q13. Department is HR or Sales
-
-db.employee.find({
-    department: {
-        $in: ["HR", "Sales"]
-    }
-})
-
-========================================
-PART E - ARRAY OPERATIONS
-========================================
-
-Q14. Add Express.js to employee 101
-
-db.employee.updateOne(
-    { employee_id: 101 },
-    { $push: { skills: "Express.js" } }
-)
-
-This uses $push to add an element to an array.
-
-Q15. Remove PHP from Jane Doe
-
-db.employee.updateOne(
-    { name: "Jane Doe" },
-    { $pull: { skills: "PHP" } }
-)
-
-Jane currently doesn't have a skills field in the supplied data,
-so this may modify 0 documents' arrays. The query is still the requested operation.
-
-Q16. Add MongoDB only if it doesn't already exist
-
-db.employee.updateOne(
-    { employee_id: 101 },
-    { $addToSet: { skills: "MongoDB" } }
-)
-
-$addToSet prevents a duplicate value from being added to the array.
-
-========================================
-PART F - PROJECTION
-========================================
-
-Q17. Display all documents
-
-db.employee.find()
-
-Q18. Display only employee_id, name, department and salary
-
-db.employee.find(
-    {},
-    {
-        employee_id: 1,
-        name: 1,
-        department: 1,
-        salary: 1
-    }
-)
-
-Q19. Display employee_id, name and department, excluding _id
-
-db.employee.find(
-    {},
-    {
-        employee_id: 1,
-        name: 1,
-        department: 1,
-        _id: 0
-    }
-)
-
-========================================
-PART G - UPDATE OPERATIONS
-========================================
-
-Q20. Display employees in HR
-
-db.employee.find({
-    department: "HR"
-})
-
-Q21. Set HR salary to 50000
-
-Use the modern updateMany() form:
-
-db.employee.updateMany(
-    { department: "HR" },
-    { $set: { salary: 50000 } }
-)
-
-The practical gives the older update() version for this question.
-
-Q22. Set salary to 75000 where employee_id > 104
-
-db.employee.updateMany(
-    { employee_id: { $gt: 104 } },
-    { $set: { salary: 75000 } }
-)
-
-The practical specifies the same condition and update, although its
-printed update() example has a missing closing brace.
-
-========================================
-PART H - DELETE AND RENAME
-========================================
-
-Q23. Remove any one employee
-
-For example, remove employee 105:
-
-db.employee.deleteOne({
-    employee_id: 105
-})
-
-MongoDB's deleteOne() removes a single document matching the condition.
-
-Rename collection to employee_details
-
-db.employee.renameCollection("employee_details")
-
-IMPORTANT:
-Do not run the final deleteOne() or renameCollection() until you have
-finished the earlier questions, because deleting employee 105 and
-renaming employee changes what later commands can access.
-
-========================================
-COMPLETE COMMAND SEQUENCE
-========================================
-
-use emp_db
-
-db.createCollection("employee")
-
-db.employee.insertOne({
-    employee_id: 101,
-    name: "John Doe",
-    department: "IT",
-    salary: 70000
-})
-
-db.employee.insertMany([
-    {
-        employee_id: 102,
-        name: "Jane Doe",
-        department: "HR",
-        salary: 55000	
-    },
-    {
-        employee_id: 103,
-        name: "Alex Roy",
-        department: "Sales",
-        salary: 60000
-    }
-])
-
-db.employee.insertOne({
-    employee_id: 104,
-    name: "Priya Sharma",
-    department: "Development",
-    salary: 75000,
-    skills: ["MongoDB", "Node.js", "React"]
-})
-
-db.employee.insertOne({
-    employee_id: 105,
-    name: "Ravi Kumar",
-    department: "Design",
-    salary: 50000,
-    address: {
-        street: "MG Road",
-        city: "Pune",
-        zipcode: 411001
-    }
-})
-
-db.employee.find()
-
-db.employee.find({ department: "IT" })
-
-db.employee.find({ salary: { $gt: 60000 } })
-
-db.employee.find({ skills: "Python" })
-
-db.employee.find({ "address.city": "Pune" })
-
-db.employee.find({
-    salary: { $gte: 50000, $lte: 80000 }
-})
-
-db.employee.find({
-    department: { $in: ["HR", "Sales"] }
-})
-
-db.employee.updateOne(
-    { employee_id: 101 },
-    { $push: { skills: "Express.js" } }
-)
-
-db.employee.updateOne(
-    { name: "Jane Doe" },
-    { $pull: { skills: "PHP" } }
-)
-
-db.employee.updateOne(
-    { employee_id: 101 },
-    { $addToSet: { skills: "MongoDB" } }
-)
-
-db.employee.find(
-    {},
-    { employee_id: 1, name: 1, department: 1, salary: 1 }
-)
-
-db.employee.find(
-    {},
-    { employee_id: 1, name: 1, department: 1, _id: 0 }
-)
-
-db.employee.find({ department: "HR" })
-
-db.employee.updateMany(
-    { department: "HR" },
-    { $set: { salary: 50000 } }
-)
-
-db.employee.updateMany(
-    { employee_id: { $gt: 104 } },
-    { $set: { salary: 75000 } }
-)
-
-db.employee.deleteOne({ employee_id: 105 })
-
-db.employee.renameCollection("employee_details")
-
-//Prac 2 using states in components
-
-Prac 2 Q1) Using Props in Components
-CODE: 
-
-Classprops.js:
-import React from "react";
-
-function Child(props) {
-  return <h2>{props.name} <br /> {props.age}</h2>;
-}
-
-function Parent(props) {
-  return (
-    <>
-      <h1>Parent Class {props.address}</h1>
-      <Child name="Parent Name" age="50" />
-    </>
-  );
-}
-
-export default Parent;
-
-
-App.js: 
-import Parent from "./Classprops.js";
-
-function App() {
-  return <Parent address="qwerty" />;
-}
-
-export default App;
-
-=============================================================================================================================
-
-Prac 2 Q2) Using Functions
-CODE:
-
-Function_name.js: 
-import React from "react";
-
-export function Car(props) {
-  return <h2>I am a {props.name} !!!</h2>;
-}
-
-export function Product() {
-  return <div>
-    <h1>Product Details</h1>
-    <Car name="Wagonr"/>
-  </div>;
-}
-
-
-App.js: 
-import {Car, Product} from "./Function_name";
-
-function App() {
-  return <div>
-    <Car name="Brezza"/>
-    <Product/>
-  </div>;
-}
-
-export default App;
-
-=============================================================================================================================
-
-Prac 2 Q3) Using State in Component
-CODE:
-
-Stateless.js:
-import {useState} from "react";
-
-function Message() {
-  const [msg,setMsg] = useState("Welcome Visitors");
-
-  return <div>
-    <h1>{msg}</h1>
-    <button onClick={() => setMsg("Thank you for visiting!")}>CLICK HERE</button>
-  </div>;
-}
-
-export default Message;
-
-
-App.js: 
-import Message from "./Stateless";
-
-function App() {
-  return <Message/>;
-}
-
-export default App;
-
-=============================================================================================================================
-
-Prac 2 Q4) Class Counter
-Question: Create a counter using state and increase the number when the button is clicked.
-CODE:
-
-Classcounter.js: 
-import React,{Component} from "react";
-
-class Counter extends Component {
-  state = {count:0};
-
-  render() {
-    return <div>
-      <h1>{this.state.count}</h1>
-      <button onClick={() => this.setState({count:this.state.count+1})}>
-        INCREMENT
-      </button>
-    </div>;
-  }
-}
-
-export default Counter;
-
-
-App.js:
-import Counter from "./Classcounter";
-
-function App() {
-  return <Counter/>;
-}
-
-export default App;
-
-=============================================================================================================================
-//Prac 3 File operation in Node.js
-
-Prac 3 Q1) Read the contents of a file using synchronous method.
-CODE: 
-Read.js: 
-
-const fs = require("fs");
-
-let data = fs.readFileSync("sample.txt", "utf-8");
-console.log(data);
-
-=============================================================================================================================
-
-Prac 3 Q2) Read the contents of a file using asynchronous method.
-CODE:
-Async.js:
-
-const fs = require("fs");
-
-fs.readFile("sample.txt", "utf-8", (err, data) => {
-  console.log(data);
-});
-
-=============================================================================================================================
-
-Prac 3 Q3) Read a file using an async function.
-CODE:
-AsyncAwait.js:
-
-const fs = require("fs/promises");
-
-async function readFile() {
-  let data = await fs.readFile("example.txt", "utf-8");
-  console.log(data);
-}
-readFile();
-
-=============================================================================================================================
-
-Prac 3 Q4) Writing a File
-Question: Perform the following file operations:
-1. Created a file example.txt.
-2. Add some content and read the file.
-3. Append data to the file.
-4. Rename the file.
-5. Read the renamed file again.
-6. Delete the file.
-
-CODE:
-Write.js: 
-
-const fs = require("fs/promises");
-
-async function work() {
-  await fs.writeFile("example.txt", "Writing in a file");
-  console.log(await fs.readFile("example.txt", "utf-8"));
-
-  await fs.appendFile("example.txt", "\nData appended via Node.js");
-  await fs.rename("example.txt", "new.txt");
-
-  console.log(await fs.readFile("new.txt", "utf-8"));
-  await fs.unlink("new.txt");
-}
-
-work();
-
-=============================================================================================================================
-//Prac 4 creating node module 
-
-Prac 4 Q1) Create a Node.js module to take text input, save it in text.txt, and fire a custom event.
-CODE:
-
-pr4.js:
-
-const fs = require("fs");
-const readline = require("readline");
-const EventEmitter = require("events");
-
-const e = new EventEmitter();
-const r = readline.createInterface({input:process.stdin, output:process.stdout});
-
-e.on("textReady", text => {
-  console.log("Custom event Fired : Text is ready - " + text);
-  fs.writeFile("text.txt", text, () => {
-    console.log("Text has been saved to text.txt");
-    r.close();
-  });
-});
-
-r.question("Enter some text:", text => e.emit("textReady", text));
-
-=============================================================================================================================
-
-Prac 4 Q2) Create EventEmitter to Find Factorial of a Number
-CODE:
-
-factorial.js:
-
-const readline = require("readline");
-const EventEmitter = require("events");
-
-const e = new EventEmitter();
-const r = readline.createInterface({input:process.stdin, output:process.stdout});
-
-e.on("factorial", n => {
-  let f = 1;
-  for(let i=1;i<=n;i++) f *= i;
-  console.log("Factorial of " + n + " is " + f);
-  r.close();
-});
-
-r.question("Enter a number: ", n => e.emit("factorial", Number(n)));
-
-=============================================================================================================================
-//Prac 5 Create server and handle http request
-
-Prac 5 Q1. Create a simple Node.js program that creates an HTTP server and handles it.
-CODE:
-server.js:
-
-const http = require('http');
-
-const hostname = '127.0.0.1';
-const port = 4000;
-
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-
-    if (req.url === '/hello') {
-        res.end('Hello World!\n');
-    } 
-    else if (req.url === '/about') {
-        res.end('This is the About Page.\n');
-    } 
-    else {
-        res.end('Node.js server!\n');
-    }
-});
-
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-});
-=============================================================================================================================
-
-Prac 5 Q2. Create a Node.js program using Express that serves a list of users from a JSON file. The program should define an API endpoint to retrieve user details in JSON format.
-Requirements
-a. Display details of all users.
-b. Display details based on parameter such as id.
-
-==>
-users.json:
- 
-[
-  {"id":101,"name":"Alice","age":18},
-  {"id":102,"name":"Isha","age":20},
-  {"id":103,"name":"Ojasa","age":18},
-  {"id":104,"name":"Ritu","age":21},
-  {"id":105,"name":"Ananya","age":20},
-  {"id":106,"name":"John","age":19}
+
+def query_terms(matrix, query):
+    results = []
+    i = 0
+
+    while i < len(query):
+        word = query[i]
+
+        if word == "not" and i + 1 < len(query):
+            term = query[i + 1]
+            if term in matrix:
+                vector = [1 if v == 0 else 0 for v in matrix[term]]
+                results.append(vector)
+            i += 2
+        else:
+            if word in matrix:
+                results.append(matrix[word])
+            i += 1
+
+    if not results:
+        return [0] * len(next(iter(matrix.values())))
+
+    final = results[0]
+    for vector in results[1:]:
+        final = [a & b for a, b in zip(final, vector)]
+
+    return final
+
+
+if __name__ == "__main__":
+    docs, full_terms = accept_docs()
+    matrix = print_incident_matrix(docs, full_terms)
+
+    print("\nIncidence Matrix:")
+    for term, vector in matrix.items():
+        print(f"{term}: {vector}")
+
+    query = input("Enter query terms (space-separated): ").lower().split()
+    result = query_terms(matrix, query)
+    print("Result after evaluation (BITWISE AND):", result)
+#input
+#Enter no. of docs: 3
+#Enter the content of doc1: Taj Mahal is a beautiful monument
+#Enter the content of doc2: Victoria Memorial is also a a monument
+#Enter the content of doc3: I like to visit Agra
+#....
+#Enter query terms (space-separated): Taj Mahal NOT Agra
+
+#PRAC 2B
+#Implement the Vector Space Model and process queries.
+import math
+from collections import Counter
+
+n = int(input("Enter number of documents: "))
+documents = []
+
+for i in range(n):
+    documents.append(input("Enter Document " + str(i+1) + ": ").lower())
+
+query = input("Enter Query: ").lower()
+
+print("\nSTEP 1 : Documents and Query")
+for i in range(n):
+    print("Document", i+1, ":", documents[i])
+print("Query :", query)
+
+print("\nSTEP 2 : Frequency Table")
+for i in range(n):
+    print("\nDocument", i+1)
+    for word, count in Counter(documents[i].split()).items():
+        print(word, ":", count)
+
+vocabulary = []
+for doc in documents:
+    for word in doc.split():
+        if word not in vocabulary:
+            vocabulary.append(word)
+
+vocabulary.sort()
+
+print("\nSTEP 3 : Vocabulary")
+print(vocabulary)
+
+print("\nSTEP 4 : Arranged Vocabulary")
+print(vocabulary)
+
+print("\nSTEP 5 : Vectors")
+vectors = []
+
+for i in range(n):
+    v = []
+    for word in vocabulary:
+        v.append(1 if word in documents[i].split() else 0)
+    vectors.append(v)
+    print("Document", i+1, "Vector :", v)
+
+q = [1 if word in query.split() else 0 for word in vocabulary]
+print("Query Vector :", q)
+
+print("\nSTEP 6 : Cosine Similarity")
+similarity = []
+
+for v in vectors:
+    dot = sum(v[i] * q[i] for i in range(len(q)))
+    a = math.sqrt(sum(x*x for x in v))
+    b = math.sqrt(sum(x*x for x in q))
+    
+    if a == 0 or b == 0: 
+        sim = 0
+    else:
+        sim = dot / (a * b)
+    
+    similarity.append(sim)
+
+for i in range(n):
+    print("Document", i+1, "=", round(similarity[i], 4))
+
+print("\nSTEP 7 : Ranked Documents")
+rank = sorted(enumerate(similarity, 1), key=lambda x: x[1], reverse=True)
+
+for doc, score in rank:
+    print("Document", doc, ":", round(score, 4))
+#Input:
+#Enter number of documents: 3
+#Enter Document 1: information retrieval is fun
+#Enter Document 2: information systems are important
+#Enter Document 3: retrieval of data is important
+#Enter Query: information retrieval
+
+#Prac 3
+# Spelling Correction in IR System using Edit Distance.
+str1 = input("Enter the first String: ")
+str2 = input("Enter the second String: ")
+
+print(f"String 1: {str1}")
+print(f"String 2: {str2}")
+
+
+def edit_distance(str1, str2):
+    n = len(str1)
+    m = len(str2)
+
+    dp = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
+
+    for i in range(m + 1):
+        dp[i][0] = i
+
+    for j in range(n + 1):
+        dp[0][j] = j
+
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if str2[i - 1] == str1[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = 1 + min(
+                    dp[i - 1][j],
+                    dp[i][j - 1],
+                    dp[i - 1][j - 1]
+                )
+
+    return dp
+
+
+dp = edit_distance(str1, str2)
+
+print("\nEdit Distance Matrix:")
+for row in dp:
+    print(row)
+
+print("\nFinal Edit Distance =", dp[len(str2)][len(str1)])
+#Input:
+#Enter the first String: EDITING
+#Enter the second String: DISTANCE
+
+#Practical 4
+# Recall, Precision and F-measure.
+relevant_set = input(
+    "Enter Relevant Set [separated by comma]: "
+).split(",")
+
+retrieved_set = input(
+    "Enter Retrieved Set [separated by comma]: "
+).split(",")
+
+relevant_set = [doc.strip() for doc in relevant_set if doc.strip()]
+retrieved_set = [doc.strip() for doc in retrieved_set if doc.strip()]
+
+common = [doc for doc in retrieved_set if doc in relevant_set]
+
+R = len(relevant_set)
+A = len(retrieved_set)
+RA = len(common)
+
+print("Relevant R:", R)
+print("Retrieved A:", A)
+print("Common RA:", RA)
+
+print(f"\nCommon Points: {','.join(common)}")
+
+precision = RA / A if A != 0 else 0
+recall = RA / R if R != 0 else 0
+
+if precision + recall != 0:
+    f_measure = (2 * precision * recall) / (precision + recall)
+else:
+    f_measure = 0
+
+print(f"\nPrecision = {RA}/{A} = {precision * 100:.2f}%")
+print(f"Recall = {RA}/{R} = {recall * 100:.2f}%")
+print(f"F-measure = {f_measure * 100:.2f}%")
+##Input :
+#Enter Relevant Set [separated by comma]: d2,d5,d9,d13,d20,d25,d33,d41,d50
+#Enter Retrieved Set [separated by comma]: d5,d8,d30,d15,d33,d6,d2,d60,d17,d30
+#Prac5
+#Naive Bayes Text Categorization.
+data = [
+    ['Y', 'N', 'Y'],
+    ['N', 'Y', 'Y'],
+    ['Y', 'Y', 'Y'],
+    ['N', 'N', 'N'],
+    ['Y', 'N', 'Y'],
+    ['N', 'N', 'Y'],
+    ['Y', 'N', 'Y'],
+    ['Y', 'N', 'N'],
+    ['N', 'Y', 'Y'],
+    ['N', 'Y', 'N']
 ]
-	
-CODE:
-users.js:
-
-const fs = require("fs");
-
-const port = 8000;
-
-const express = require("express");
-const app = express();
-
-let users = JSON.parse(fs.readFileSync("./users.json"));
-
-app.get("/api/v1/users", (req, res) => {
-  res.status(200).json(users);
-});
-
-app.get("/api/v1/users/:id", (req, res) => {
-  let id = req.params.id * 1;
-
-  const find_user = users.find((e1) => e1.id === id);
-
-  res.status(200).json(find_user);
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-#steps for prac5 Q2
-first terminal mai ye run krna
-npm init -y
-You should see a new file:
-package.json
-then npm install express
-This creates:
-node_modules
-Q2
-│
-├── node_modules
-├── package-lock.json
-└── package.json
-In your Q2 terminal
-node user.js
-You should see:
-Server running at http://localhost:8000
-
-Open your browser or Thunder Client.
-http://localhost:8000/api/v1/users
-
-For thunderclient
-Method:
-GET
-You should receive JSON similar to:
-Get a specific user
-http://localhost:8000/api/v1/users/102
-You should get:
-{
-"id": 102,
-"name": "Faizan",
-"age": 19
-}	
-=============================================================================================================================
 
-//Prac 6 Connect Nodejs with MongoDB 
-
-Prac 6 1) connect Nodejs with mongodb and create database and collection 
-run: node Connect.js
+flu = input("Flu (Y/N): ").upper()
+covid = input("Covid (Y/N): ").upper()
+
+total = len(data)
+score = {}
+
+for fever in ["Y", "N"]:
+    rows = [row for row in data if row[2] == fever]
+    n = len(rows)
+
+    prior = n / total
+    flu_prob = sum(row[1] == flu for row in rows) / n
+    covid_prob = sum(row[0] == covid for row in rows) / n
+
+    score[fever] = prior * flu_prob * covid_prob
+
+    print(f"\nFever = {fever}")
+    print("P(Flu | Fever) =", round(flu_prob, 4))
+    print("P(Covid | Fever) =", round(covid_prob, 4))
+    print("P(Fever) =", round(prior, 4))
+    print("Score =", round(score[fever], 4))
+
+print("\nP(Y | Flu,Covid):", round(score["Y"], 4))
+print("P(N | Flu,Covid):", round(score["N"], 4))
+
+if score["Y"] > score["N"]:
+    print("Predicted Fever: Y")
+elif score["N"] > score["Y"]:
+    print("Predicted Fever: N")
+else:
+    print("Prediction: Tie")
+#input
+#Flu (Y/N): y
+#Covid (Y/N): y
+    
+#Practical No: 6
+#Aim: Implement a clustering algorithm (K-means).
+import math
+
+def distance(a,b):
+    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+
+n = int(input("Enter number of points: "))
+p = []
+
+for i in range(n):
+    x = float(input("Enter X coordinate of P"+str(i+1)+": "))
+    y = float(input("Enter Y coordinate of P"+str(i+1)+": "))
+    p.append((x,y))
+
+k1 = p[0]
+k2 = p[1]
+
+print("\nInitial Values:")
+print("K1 =", k1)
+print("K2 =", k2)
+
+for i in range(2,n):
+    print("\nCalculating P"+str(i+1)+" =", p[i])
+
+    d1 = distance(p[i],k1)
+    d2 = distance(p[i],k2)
+
+    print("Distance from K1 =", round(d1,2))
+    print("Distance from K2 =", round(d2,2))
+
+    if d1 < d2:
+        print("P"+str(i+1)+" belongs to K1")
+        k1 = ((k1[0]+p[i][0])/2, (k1[1]+p[i][0])/2)
+        print("New K1 =", k1)
+    else:
+        print("P"+str(i+1)+" belongs to K2")
+        k2 = ((k2[0]+p[i][0])/2, (k2[1]+p[i][1])/2)
+        print("New K2 =", k2)
+
+print("\nFINAL RESULT")
+print("Final K1 =", k1)
+print("Final K2 =", k2)
+#input
+#Enter number of points: 7
+#Enter X coordinate of P1: 20
+#Enter Y coordinate of P1: 500
+#Enter X coordinate of P2: 40
+#Enter Y coordinate of P2: 1000
+#Enter X coordinate of P3: 30
+#Enter Y coordinate of P3: 800
+#Enter X coordinate of P4: 18
+#Enter Y coordinate of P4: 300
+#Enter X coordinate of P5: 28
+#Enter Y coordinate of P5: 1200
+#Enter X coordinate of P6: 35
+#Enter Y coordinate of P6: 1400
+#Enter X coordinate of P7: 45
+#Enter Y coordinate of P7: 1800
+#prac 7
+#Web Crawling and Indexing
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+from urllib.robotparser import RobotFileParser
+
+seen = set()
+
+def crawl(url, depth=2):
+    if url in seen or depth == 0:
+        return
+    seen.add(url)
 
-CODE:
+    r = RobotFileParser(urljoin(url, "/robots.txt"))
+    r.read()
 
-Connect.js:
-const { MongoClient } = require("mongodb");
+    if not r.can_fetch("MiniCrawler", url):
+        print("Blocked:", url)
+        return
 
-async function main() {
-  const client = new MongoClient("mongodb://localhost:27017");
+    soup = BeautifulSoup(requests.get(url).text, "html.parser")
+    print("Crawled:", url)
 
-  try {
-    await client.connect();
-    console.log("Connected");
+    for a in soup.find_all("a", href=True):
+        link = urljoin(url, a["href"])
+        if link.startswith("http"):
+            crawl(link, depth - 1)
 
-    const db = client.db("myDatabase");
-    const collection = db.collection("myCollection");
+crawl("https://.vercel.app", 2)
 
-    const data = [
-      {name:"john",age:30},
-      {name:"jane",age:25},
-      {name:"joe",age:40}
-    ];
-
-    const result = await collection.insertMany(data);
-    console.log(result.insertedCount + " documents inserted");
+#Prac8
+#prac8A
+#Implement the PageRank algorithm
 
-  } finally {
-    await client.close();
-  }
-}
+import numpy as np
 
-main();
+n = int(input("Enter number of nodes: "))
+links = int(input("Enter the number of links: "))
 
-=============================================================================================================================
+adj_matrix = np.zeros((n, n))
 
-Prac 6 2) (i) Take an input field to add an element into array using states
-Arraylist.js:
-import React,{useState} from "react";
+print("Enter links (from_node to_node):")
 
-function Arraylist(){
-  const [list,setList]=useState(["Earth","Jeff","Mew"]);
+for _ in range(links):
+    a, b = map(int, input().split())
+    a -= 1
+    b -= 1
+    adj_matrix[b][a] = 1
 
-  function add(){
-    setList([...list,document.getElementById("friend").value]);
-  }
+print("\nAdjacency Matrix:")
+print(adj_matrix)
 
-  return <div>
-    <h1>List</h1>
-    {list.map(x=><li>{x}</li>)}
-    <input id="friend"/>
-    <button onClick={add}>Add</button>
-  </div>
-}
+M = np.zeros((n, n))
 
-export default Arraylist;
+for j in range(n):
+    outgoing = sum(adj_matrix[:, j])
 
-App.js:
-import Arraylist from "./Arraylist";
+    if outgoing != 0:
+        for i in range(n):
+            M[i][j] = adj_matrix[i][j] / outgoing
+    else:
+        # Dangling node: distribute equally to all nodes.
+        M[:, j] = 1 / n
 
-function App(){
-  return <Arraylist/>
-}
+print("\nTransition Matrix M:")
+print(np.round(M, 4))
 
-export default App;
+iterations = int(input("Enter number of iterations: "))
 
-2) (ii) Take a button to add users, remove user and add user after specific element
-Array.js:
-import React,{useState} from "react";
+PR = np.ones(n) / n
 
-function Array(){
-  const [users,setUsers]=useState(["User 1","User 2"]);
+print("\nPageRank Vector for each iteration:")
 
-  function add(){
-    setUsers([...users,"User "+(users.length+1)]);
-  }
+for i in range(iterations):
+    PR = np.dot(M, PR)
+    print(f"Iteration {i + 1}: {np.round(PR, 4)}")
 
-  function remove(i){
-    setUsers(users.filter((x,index)=>index!=i));
-  }
+highest = np.argmax(PR)
 
-  return <div>
-    <button onClick={add}>Add User</button>
+print("\nNode with highest PageRank:")
+print(
+    "Node",
+    highest + 1,
+    "with PageRank value",
+    round(PR[highest], 4)
+)
+#input
+#Enter number of nodes: 3
+#Enter the number of links: 7
+#Enter links (from_node to_node):
+#1 1
+#1 2
+#1 3
+#2 1
+#2 3
+#3 2
+#3 3
+#....
+#Enter number of iterations: 3
+#Prac8B
+#Apply HITS Algorithm to a small web graph and analyze the results.
+def create_graph(nodes, links):
+    graph = {node: [] for node in nodes}
 
-    {users.map((x,i)=>
-      <p>{x}
-        <button onClick={()=>remove(i)}>Remove</button>
-      </p>
-    )}
-  </div>
-}
+    for u, v in links:
+        if u not in graph or v not in graph:
+            raise ValueError("Link contains an unknown node.")
+        graph[u].append(v)
 
-export default Array;
+    return graph
 
-App.js:
-import Array from "./Array";
 
-function App(){
-  return <Array/>
-}
+def display_graph(graph):
+    print("\nDirected Graph:")
+    for node in graph:
+        print(node, "->", graph[node])
 
-export default App;
+def normalize(scores):
+    norm = sum(value * value for value in scores.values()) ** 0.5
 
-=============================================================================================================================
-//Prac 7 Hooks in functional component and lifecycle methods of class components
+    if norm == 0:
+        return {node: 0 for node in scores}
 
-Prac 7 Q1. Create a counter using useState Hook.
-CODE:
-Count1.js
-import React, { useState } from 'react';
+    return {node: scores[node] / norm for node in scores}
 
-const Count1 = () => {
-  const [count, setCount] = useState(0);
 
-  return (
-    <div>
-      <p>You clicked {count} times</p>
+def find_best(scores):
+    node = max(scores, key=scores.get)
+    return node, scores[node]
 
-      <button onClick={() => setCount(count + 1)}>
-        Click me
-      </button>
-    </div>
-  );
-};
-
-export default Count1;
-
-App.js
-import Count1 from './count1';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <Count1 />
-    </div>
-  );
-}
-
-export default App;
-
-=============================================================================================================================
-
-Prac 7 Q2. Create useReducer example for arithmetic operations.
-CODE:
-Arithmetic.js
-import { useReducer } from 'react';
-
-const initialState = 0;
-
-const reducer = (state, action) => {
-  switch (action) {
-    case "add":
-      return state + 1;
-
-    case "subtract":
-      return state - 1;
-
-    case "reset":
-      return 0;
-
-    default:
-      throw new Error("Error");
-  }
-};
-
-const Arithmetic = () => {
-  const [count, dispatch] = useReducer(reducer, initialState);
-
-  return (
-    <div>
-      <h2>{count}</h2>
-
-      <button onClick={() => dispatch("add")}>
-        Increment
-      </button>
-
-      <button onClick={() => dispatch("subtract")}>
-        decrement
-      </button>
-
-      <button onClick={() => dispatch("reset")}>
-        reset
-      </button>
-    </div>
-  );
-};
-
-export default Arithmetic;
-
-App.js
-import Arithmetic from './arithmetic';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <Arithmetic />
-    </div>
-  );
-}
-
-export default App;
-=============================================================================================================================
-
-Prac 7 Q3. Create a React application using "useReducer" hook to manage user login and logout and display users login status based on the dispatched actions.
-CODE:
-LoginStatus.js
-import { useReducer } from 'react';
-
-const initialState = {
-  isLoggedIn: false,
-  username: ""
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "login":
-      return {
-        isLoggedIn: true,
-        username: action.payload
-      };
-
-    case "logout":
-      return {
-        isLoggedIn: false,
-        username: ""
-      };
-
-    default:
-      throw new Error("Invalid action");
-  }
-};
-
-const LoginStatus = () => {
-  const [user, dispatch] = useReducer(reducer, initialState);
-
-  return (
-    <div>
-      <h2>
-        {user.isLoggedIn
-          ? `Welcome, ${user.username}`
-          : "Please Login"}
-      </h2>
-
-      <button
-        onClick={() =>
-          dispatch({
-            type: "login",
-            payload: "John"
-          })
+
+def hits():
+    nodes = input("Enter nodes separated by space: ").split()
+
+    number_of_links = int(input("Enter number of links: "))
+    links = []
+
+    for i in range(number_of_links):
+        u, v = input(f"Link {i + 1} (from to): ").split()
+        links.append((u, v))
+
+    iterations = int(input("Enter number of iterations: "))
+
+    graph = create_graph(nodes, links)
+    display_graph(graph)
+
+    hub = {node: 1 for node in nodes}
+    authority = {node: 1 for node in nodes}
+
+    for iteration in range(1, iterations + 1):
+        authority = {
+            node: sum(
+                hub[source]
+                for source in graph
+                if node in graph[source]
+            )
+            for node in nodes
         }
-      >
-        Login
-      </button>
 
-      <button
-        onClick={() =>
-          dispatch({
-            type: "logout"
-          })
+        authority = normalize(authority)
+
+        hub = {
+            node: sum(authority[target] for target in graph[node])
+            for node in nodes
         }
-      >
-        Logout
-      </button>
-    </div>
-  );
-};
 
-export default LoginStatus;
-App.js
-import LoginStatus from './LoginStatus';
-import './App.css';
+        hub = normalize(hub)
 
-function App() {
-  return (
-    <div className="App">
-      <LoginStatus />
-    </div>
-  );
+        print(f"\nIteration: {iteration}")
+        print("\nNode\tAuthority\tHub")
+
+        for node in nodes:
+            print(
+                f"{node}\t"
+                f"{authority[node]:.4f}\t\t"
+                f"{hub[node]:.4f}"
+            )
+
+    best_authority, authority_score = find_best(authority)
+    best_hub, hub_score = find_best(hub)
+
+    print("\n========================================")
+    print("Final Result")
+    print("========================================")
+    print(
+        "Best Authority Node:",
+        best_authority,
+        "Score:",
+        round(authority_score, 4)
+    )
+    print(
+        "Best Hub Node:",
+        best_hub,
+        "Score:",
+        round(hub_score, 4)
+    )
+
+
+if __name__ == "__main__":
+    hits()
+#input
+#Enter nodes separated by space: A B C D
+#Enter number of links: 8
+#Link 1 (from to): A C
+#Link 2 (from to): B A
+#Link 3 (from to): C A
+#Link 4 (from to): C B
+#Link 5 (from to): D A
+#Link 6 (from to): D B
+#Link 7 (from to): D C
+#Link 8 (from to): D D
+#Enter number of iterations: 2
+
+#Prac9
+#Program to Rank Documents using SVM (Support Vector Machine)
+import numpy as np
+from sklearn.svm import SVC
+X = np.array([
+    [2, 5],
+    [4, 3],
+    [6, 7],
+    [5, 2],
+    [7, 6],
+    [3, 4]
+])
+
+y = np.array([0, 0, 1, 1, 1, 0])
+pairs = []
+labels = []
+
+for i in range(len(X)):
+    for j in range(len(X)):
+        if y[i] > y[j]:
+            pairs.append(X[i] - X[j])
+            labels.append(1)
+            pairs.append(X[j] - X[i])
+            labels.append(0)
+pairs = np.array(pairs)
+labels = np.array(labels)
+model = SVC(kernel="linear")
+model.fit(pairs, labels)
+weights = model.coef_[0]
+scores = X @ weights
+rank = np.argsort(scores)[::-1]
+
+print("Ranked Documents:")
+
+for i in rank:
+    print(f"D{i + 1} Score = {scores[i]:.2f}")
+
+#Practical No: 10A
+#Implement text summarization algorithm (extractive).
+# If required, install:
+# python -m pip install nltk
+# python -m nltk.downloader punkt_tab
+import nltk
+from nltk.tokenize import sent_tokenize, word_tokenize
+from collections import Counter
+
+text = """Artificial Intelligence is changing the world.
+Machine learning is an important part of Artificial Intelligence.
+AI is used in healthcare and education.
+AI helps computers learn from data."""
+
+sentences = sent_tokenize(text)
+
+words = word_tokenize(text.lower())
+freq = Counter(
+    word for word in words if word.isalnum()
+)
+
+scores = {}
+
+for sentence in sentences:
+    sentence_words = word_tokenize(sentence.lower())
+    scores[sentence] = sum(
+        freq[word] for word in sentence_words if word.isalnum()
+    )
+
+summary = sorted(
+    sentences,
+    key=lambda sentence: scores[sentence],
+    reverse=True
+)[:2]
+
+print("Summary:")
+print(" ".join(summary))
+
+#Practical No: 10B
+#Aim: Build a question-answering system using information extraction.
+# If required, install:
+# python -m pip install nltk
+# python -m nltk.downloader punkt_tab
+
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+
+text = """Python is a programming language.
+Python was created by Guido van Rossum.
+Python is widely used in Artificial Intelligence.
+Python was first released in 1991."""
+
+question = input("Enter question: ")
+
+q_words = {
+    word for word in word_tokenize(question.lower())
+    if word.isalnum()
 }
 
-export default App;
-=============================================================================================================================
-//Prac 8 Fetch the API data and render the list on React app
-
-Prac 8 Q1. Fetch the API data and display it
-CODE:
-Fetchdata.js:
-import React, { useState, useEffect } from "react";
-function FetchData() {
-  const [posts, setPosts] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users",
-      );
-      const data = await response.json();
-      setPosts(data);
-    };
-    fetchData();
-  }, []);
-  return (
-    <div>
-      {posts.map((post) => (
-        <div key={post.id}>
-          <h2>{post.name}</h2>
-          <p>{post.email}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-export default FetchData;
-
-App.js:
-import React from "react";
-import FetchData from "./Fetchdata.js";
-function App() {
-  return (
-    <div className="App">
-      <h1>Users List</h1>
-      <FetchData />
-    </div>
-  );
-}
-export default App;
-
-=============================================================================================================================
-
-Prac 8 Q2. Create Employee and Salary Components to use context provided by Parent Component. Employee component has nested Salary component in it. Display Employee data in Employee Component and Salary data in Salary Component.
-CODE:
-EmployeeComponent.js
-
-import React, { useState, useContext } from "react";
-const employeeContext = React.createContext();
-function Parent() {
-  const [employee, setEmployee] = useState({
-    id: 101,
-    Name: "Bible",
-    salary: 50000,
-  });
-  return (
-    <div>
-      <h2>Welcome to Parent Component...</h2>
-      <employeeContext.Provider value={employee}>
-        <Employee />
-        <Salary />
-      </employeeContext.Provider>
-    </div>
-  );
-}
-function Employee() {
-  const context = useContext(employeeContext);
-  return (
-    <div>
-      <h2>Welcome to the Employee Component</h2>
-      <p>Employee ID: {context.id}</p>
-      <p>Employee Name: {context.Name}</p>
-    </div>
-  );
-}
-function Salary() {
-  const context = useContext(employeeContext);
-  return (
-    <div>
-      <h2>Welcome to the Salary Component</h2>
-      <p>Employee Salary: ₹{context.salary}</p>
-    </div>
-  );
-}
-
-App.js:
-import React from "react";
-import Parent from "./EmployeeContext.js";
-function App() {
-  return (
-    <div className="App">
-      <Parent />
-    </div>
-  );
-}
-export default App;
-
-
-=============================================================================================================================
-
-Prac 8 Q3. Create 5 components. Component 1 should create a context and give access to Component 3 and 5. Display the data. Use the same employee data.
-CODE:
-FiveComponents.js
-import React, { useState, useContext } from "react";
-const EmployeeContext = React.createContext();
-function Component1() {
-  const [employee] = useState({
-    id: 101,
-    Name: "Bible",
-    salary: 50000
-  });
-  return (
-    <EmployeeContext.Provider value={employee}>
-      <h2>Component 1</h2>
-      <p>Employee data is created in Component 1</p>
-      <Component2 />
-      <Component3 />
-      <Component4 />
-      <Component5 />
-    </EmployeeContext.Provider>
-  );
-}
-function Component2() {
-  return (
-    <div>
-      <h2>Component 2</h2>
-      <p>No employee data required.</p>
-    </div>
-  );
-}
-function Component3() {
-  const employee = useContext(EmployeeContext);
-  return (
-    <div>
-      <h2>Component 3</h2>
-      <p>Employee ID: {employee.id}</p>
-      <p>Employee Name: {employee.Name}</p>
-    </div>
-  );
-}
-function Component4() {
-  return (
-    <div>
-      <h2>Component 4</h2>
-      <p>No employee data required.</p>
-    </div>
-  );
-}
-function Component5() {
-  const employee = useContext(EmployeeContext);
-  return (
-    <div>
-      <h2>Component 5</h2>
-      <p>Employee Salary: ₹{employee.salary}</p>
-    </div>
-  );
-}
-
-export default Component1;
-
-
-App.js:
-
-import React from "react";
-import Parent from "./FiveComponents.js";
-function App() {
-  return (
-    <div className="App">
-      <Parent />
-    </div>
-  );
-}
-export default App;
-
-=============================================================================================================================
-
-//Prac 9 In react submit user data by using API
-
-Prac 9 1) Mounting Program
-
-CODE: 
-
-exam.js:
-import React from "react";
-
-class Header extends React.Component {
-  constructor() {
-    super();
-    this.state = { favcolor: "red" };
-  }
-
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({ favcolor: "blue" });
-    }, 5000);
-  }
-
-  getSnapshotBeforeUpdate(prevProps, prevState) {
-    document.getElementById("div1").innerHTML =
-      "Before update, favcolor was " + prevState.favcolor;
-  }
-
-  componentDidUpdate() {
-    document.getElementById("div2").innerHTML =
-      "The updated favcolor is " + this.state.favcolor;
-  }
-
-  render() {
-    return (
-      <section>
-        <h2>This is Practical 9 Question 1 {this.state.favcolor}</h2>
-        <div id="div1"></div>
-        <div id="div2"></div>
-      </section>
-    );
-  }
-}
-
-export default Header;
-
-App.js:
-import './App.css';
-import Header from './exam';
-
-function App() {
-  return <Header />;
-}
-
-export default App;
-
-=============================================================================================================================
-
-Prac 9 2) Unmounting Program
-
-exam.js:
-import React from "react";
-
-class Unmount extends React.Component {
-  state = { delete: false };
-
-  render() {
-    return <div>
-      <h1>User List</h1>
-      <button onClick={() => this.setState({delete:true})}>Delete Users</button>
-      {!this.state.delete && <User />}
-    </div>;
-  }
-}
-
-class User extends React.Component {
-  componentWillUnmount() {
-    alert("delete user successfully!");
-  }
-
-  render() {
-    return <div>
-      <h3>Mulund College of Commerce (Autonomous) 2026-27</h3>
-      <h3>UserName: dummy</h3>
-      <h3>Email: dummy@gmail.com</h3>
-    </div>;
-  }
-}
-
-export default Unmount;
-
-App.js:
-import Unmount from './exam';
-
-function App() {
-  return <Unmount />;
-}
-
-export default App;
-
-=============================================================================================================================
-// Prac 10 Implement Routing Using React Route
-
-Prac 10 Q1. Create three pages: Home, About, and Contact using React Router. Configure routes to navigate between the three pages.
-CODE:
-Home.js
-function Home() {
-  return (
-    <div>
-      <h1>Home Page</h1>
-      <p>Welcome to our website!</p>
-    </div>
-  );
-}
-
-export default Home;
-
-About.js
-function About() {
-  return (
-    <div>
-      <h1>About Page</h1>
-      <p>This is the about page.</p>
-    </div>
-  );
-}
-
-export default About;
-
-Contact.js
-function Contact() {
-  return (
-    <div>
-      <h1>Contact Page</h1>
-      <p>Contact us at example@gmail.com</p>
-    </div>
-  );
-}
-
-export default Contact;
-
-App.js
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Home from "./Home";
-import About from "./About";
-import Contact from "./Contact";
-
-function App() {
-  return (
-    <BrowserRouter>
-      <nav>
-        <Link to="/">Home</Link> |{" "}
-        <Link to="/about">About</Link> |{" "}
-        <Link to="/contact">Contact</Link>
-      </nav>
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App;
-=============================================================================================================================
-
-Prac 10 Q2. Create a navigation bar using Link or NavLink for Home, Products, About and Contact.
-CODE:
-Navbar.js
-import { NavLink } from "react-router-dom";
-
-function Navbar() {
-  return (
-    <nav>
-      <NavLink
-        to="/"
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        Home
-      </NavLink>
-
-      <NavLink
-        to="/products"
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        Products
-      </NavLink>
-
-      <NavLink
-        to="/about"
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        About
-      </NavLink>
-
-      <NavLink
-        to="/contact"
-        className={({ isActive }) => (isActive ? "active" : "")}
-      >
-        Contact
-      </NavLink>
-    </nav>
-  );
-}
-
-export default Navbar;
-App.js
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./Navbar";
-import Home from "./Home";
-import About from "./About";
-import Contact from "./Contact";
-
-function Products() {
-  return (
-    <div>
-      <h1>Products Page</h1>
-      <p>Welcome to our products page!</p>
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Navbar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App;
-
-
-=============================================================================================================================
-
-Prac 10 Q3. Create a NotFound component that displays “404 - Page Not Found”. Display it whenever the user enters an invalid URL.
-CODE:
-NotFound.js
-function NotFound() {
-  return (
-    <div>
-      <h1>404 - Page Not Found</h1>
-      <p>Sorry, the page you are looking for does not exist.</p>
-    </div>
-  );
-}
-
-export default NotFound;
-
-App.js
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./Navbar";
-import Home from "./Home";
-import About from "./About";
-import Contact from "./Contact";
-import NotFound from "./NotFound";
-
-function Products() {
-  return (
-    <div>
-      <h1>Products Page</h1>
-      <p>Welcome to our products page!</p>
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Navbar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-=============================================================================================================================
-
-Prac 10 Q4. Create a nested route with two child routes using <Outlet />.
-CODE:
-Products.js
-import { Outlet, NavLink } from "react-router-dom";
-
-function Products() {
-  return (
-    <div>
-      <h1>Products</h1>
-
-      <NavLink to="electronics">Electronics</NavLink>{" | "}
-      <NavLink to="clothing">Clothing</NavLink>
-
-      <Outlet />
-    </div>
-  );
-}
-
-export default Products;
-
-Electronics.js
-function Electronics() {
-  return (
-    <div>
-      <h2>Electronics</h2>
-      <p>Mobile phones, laptops and other electronic items.</p>
-    </div>
-  );
-}
-
-export default Electronics;
-
-Clothing.js
-function Clothing() {
-  return (
-    <div>
-      <h2>Clothing</h2>
-      <p>Shirts, jeans, jackets and other clothing items.</p>
-    </div>
-  );
-}
-
-export default Clothing;
-
-App.js
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./Navbar";
-import Home from "./Home";
-import About from "./About";
-import Contact from "./Contact";
-import Products from "./Products";
-import Electronics from "./Electronics";
-import Clothing from "./Clothing";
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Navbar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        
-        <Route path="/products" element={<Products />}>
-          <Route path="electronics" element={<Electronics />} />
-          <Route path="clothing" element={<Clothing />} />
-        </Route>
-
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App;
+best_sentence = ""
+best_score = 0
+
+for sentence in sent_tokenize(text):
+    words = {
+        word for word in word_tokenize(sentence.lower())
+        if word.isalnum()
+    }
+
+    score = len(q_words & words)
+
+    if score > best_score:
+        best_score = score
+        best_sentence = sentence
+
+if best_sentence:
+    print("Answer:", best_sentence)
+else:
+    print("Answer: No relevant information found.")
+#input
+#Enter question: artifical intelligence uses which programming language widely
+#Answer: Python is a programming language.
+#Enter question: who created python
+#Answer: Python was created by Guido van Rossum.'''
