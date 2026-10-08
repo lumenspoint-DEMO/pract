@@ -1,734 +1,750 @@
-#PRAC1
-#Implement an inverted index construction algorithm (Posting Method). Build a simple document retrieval system using constructed index
-def get_documents():
-    n = int(input("Enter the number of documents: "))
-    documents = {}
+Universal cmd command: python -m pip install numpy scipy pandas statsmodels
+
+#prac 6
+#1) Perform testing of hypothesis for mean of one sample using z-test.
+
+import numpy as np
+from scipy.stats import norm
+
+n = int(input("Enter number of values: "))
+
+data = []
+for i in range(n):
+    data.append(float(input(f"Enter value {i+1}: ")))
+
+mu = float(input("Enter population mean: "))
+sigma = float(input("Enter population standard deviation: "))
+alpha = float(input("Enter significance level: "))
+
+z = (np.mean(data) - mu) / (sigma / np.sqrt(n))
+p = norm.cdf(z)
+
+print("\nSample Mean =", np.mean(data))
+print("Z-value =", z)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+#INPUT
+# Enter number of values: 5
+# Enter value 1: 48
+# Enter value 2: 52
+# Enter value 3: 50
+# Enter value 4: 49
+# Enter value 5: 51
+# Enter population mean: 50
+# Enter population standard deviation: 2
+# Enter significance level: 0.05
+
+
+#2) Perform testing of hypothesis for mean of one sample using t-test.
+
+import numpy as np
+from scipy.stats import ttest_1samp
+
+n = int(input("Enter number of values: "))
+
+data = []
+for i in range(n):
+    data.append(float(input(f"Enter value {i+1}: ")))
+
+mu = float(input("Enter population mean: "))
+alpha = float(input("Enter significance level: "))
+
+t, p = ttest_1samp(data, mu)
+
+print("\nSample Mean =", np.mean(data))
+print("T-value =", t)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+#INPUT
+# Enter number of values: 5
+# Enter value 1: 48
+# Enter value 2: 52
+# Enter value 3: 50
+# Enter value 4: 49
+# Enter value 5: 51
+# Enter population mean: 50
+# Enter significance level: 0.05
+
+#3) Perform testing of hypothesis for equality of mean of two samples using z-test.
+
+import numpy as np
+from scipy.stats import norm
+
+n1 = int(input("Enter number of values in sample 1: "))
+
+data1 = []
+for i in range(n1):
+    data1.append(float(input(f"Enter sample 1 value {i+1}: ")))
+
+n2 = int(input("Enter number of values in sample 2: "))
+
+data2 = []
+for i in range(n2):
+    data2.append(float(input(f"Enter sample 2 value {i+1}: ")))
+
+sigma1 = float(input("Enter standard deviation of sample 1: "))
+sigma2 = float(input("Enter standard deviation of sample 2: "))
+alpha = float(input("Enter significance level: "))
+
+z = (np.mean(data1) - np.mean(data2)) / np.sqrt(
+    sigma1**2 / n1 + sigma2**2 / n2
+)
+
+p = 2 * norm.sf(abs(z))
+
+print("\nMean 1 =", np.mean(data1))
+print("Mean 2 =", np.mean(data2))
+print("Z-value =", z)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+#INPUT
+# Enter number of values in sample 1: 5
+# Enter sample 1 value 1: 48
+# Enter sample 1 value 2: 52
+# Enter sample 1 value 3: 50
+# Enter sample 1 value 4: 49
+# Enter sample 1 value 5: 51
+# Enter number of values in sample 2: 5
+# Enter sample 2 value 1: 46
+# Enter sample 2 value 2: 48
+# Enter sample 2 value 3: 47
+# Enter sample 2 value 4: 49
+# Enter sample 2 value 5: 50
+# Enter standard deviation of sample 1: 2
+# Enter standard deviation of sample 2: 2
+# Enter significance level: 0.05
+
+
+#4) Perform testing of hypothesis for equality of mean of two samples using t-test (independent).
+
+import numpy as np
+from scipy.stats import ttest_ind
+
+n1 = int(input("Enter number of values in sample 1: "))
+
+data1 = []
+for i in range(n1):
+    data1.append(float(input(f"Enter sample 1 value {i+1}: ")))
+
+n2 = int(input("Enter number of values in sample 2: "))
+
+data2 = []
+for i in range(n2):
+    data2.append(float(input(f"Enter sample 2 value {i+1}: ")))
+
+alpha = float(input("Enter significance level: "))
+
+t, p = ttest_ind(data1, data2)
+
+print("\nMean 1 =", np.mean(data1))
+print("Mean 2 =", np.mean(data2))
+print("T-value =", t)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+#INPUT
+# Enter number of values in sample 1: 5
+# Enter sample 1 value 1: 48
+# Enter sample 1 value 2: 52
+# Enter sample 1 value 3: 50
+# Enter sample 1 value 4: 49
+# Enter sample 1 value 5: 51
+# Enter number of values in sample 2: 5
+# Enter sample 2 value 1: 46
+# Enter sample 2 value 2: 48
+# Enter sample 2 value 3: 47
+# Enter sample 2 value 4: 49
+# Enter sample 2 value 5: 50
+# Enter significance level: 0.05
+
+
+#5) Perform testing of hypothesis for equality of mean of two samples using t-test (dependent).
+
+import numpy as np
+from scipy.stats import ttest_rel
+
+n = int(input("Enter number of pairs: "))
+
+before = []
+after = []
+
+for i in range(n):
+    before.append(float(input(f"Enter before value {i+1}: ")))
+    after.append(float(input(f"Enter after value {i+1}: ")))
+
+alpha = float(input("Enter significance level: "))
+
+t, p = ttest_rel(after, before)
+
+print("\nBefore Mean =", np.mean(before))
+print("After Mean =", np.mean(after))
+print("T-value =", t)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+#INPUT
+# Enter number of pairs: 5
+# Enter before value 1: 50
+# Enter after value 1: 52
+# Enter before value 2: 48
+# Enter after value 2: 51
+# Enter before value 3: 49
+# Enter after value 3: 50
+# Enter before value 4: 51
+# Enter after value 4: 53
+# Enter before value 5: 47
+# Enter after value 5: 49
+# Enter significance level: 0.05
+
+
+#prac7
+#1) Perform testing of hypothesis for variance of one sample.
+
+import numpy as np
+from scipy.stats import chi2
+
+n = int(input("Enter number of values: "))
+
+data = []
+for i in range(n):
+    data.append(float(input(f"Enter value {i+1}: ")))
+
+variance = float(input("Enter population variance: "))
+alpha = float(input("Enter significance level: "))
+
+s2 = np.var(data, ddof=1)
+
+chi = (n - 1) * s2 / variance
+
+p = 2 * min(chi2.cdf(chi, n - 1), chi2.sf(chi, n - 1))
+
+print("\nSample Variance =", s2)
+print("Chi-square value =", chi)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+#INPUT
+# Enter number of values: 5
+# Enter value 1: 48
+# Enter value 2: 52
+# Enter value 3: 50
+# Enter value 4: 49
+# Enter value 5: 51
+# Enter population variance: 2
+# Enter significance level: 0.05
+
+
+#2) Perform testing of hypothesis for variance of two samples.
+
+import numpy as np
+from scipy.stats import f
+
+n1 = int(input("Enter number of values in sample 1: "))
+
+data1 = []
+for i in range(n1):
+    data1.append(float(input(f"Enter sample 1 value {i+1}: ")))
+
+n2 = int(input("Enter number of values in sample 2: "))
+
+data2 = []
+for i in range(n2):
+    data2.append(float(input(f"Enter sample 2 value {i+1}: ")))
+
+alpha = float(input("Enter significance level: "))
+
+s1 = np.var(data1, ddof=1)
+s2 = np.var(data2, ddof=1)
+
+F = s1 / s2
+p = f.cdf(F, n1 - 1, n2 - 1)
+
+print("\nVariance 1 =", s1)
+print("Variance 2 =", s2)
+print("F-value =", F)
+print("P-value =", p)
+
+if p < alpha:
+    print("H0 is rejected")
+else:
+    print("H0 is accepted")
+
+
+
+#prac 8
+#1) Perform testing of hypothesis using one-way ANOVA.
+
+import numpy as np
+from scipy.stats import f_oneway
+
+groups = int(input("Enter number of groups: "))
+
+data = []
+
+for i in range(groups):
+    print(f"\n--- Group {i+1} ---")
+    n = int(input("Enter number of values: "))
+
+    values = []
+    for j in range(n):
+        values.append(float(input(f"Enter value {j+1}: ")))
+
+    data.append(values)
+
+alpha = float(input("\nEnter significance level: "))
+
+F, p = f_oneway(*data)
+
+print("\n===== ANOVA RESULT =====")
+print("F-value :", round(F, 4))
+print("P-value :", round(p, 4))
+
+if p < alpha:
+    print("Decision : H0 is rejected")
+else:
+    print("Decision : H0 is accepted")
+#INPUT
+# Enter number of values in sample 1: 5
+# Enter sample 1 value 1: 48
+# Enter sample 1 value 2: 52
+# Enter sample 1 value 3: 50
+# Enter sample 1 value 4: 49
+# Enter sample 1 value 5: 51
+# Enter number of values in sample 2: 5
+# Enter sample 2 value 1: 46
+# Enter sample 2 value 2: 48
+# Enter sample 2 value 3: 47
+# Enter sample 2 value 4: 49
+# Enter sample 2 value 5: 50
+# Enter significance level: 0.05
+
+
+#2) Perform testing of hypothesis using two-way ANOVA (WOR).
+
+import pandas as pd
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+
+rows = int(input("Enter number of rows: "))
+cols = int(input("Enter number of columns: "))
+
+data = []
+
+for i in range(rows):
+    row = []
+    print(f"\n--- Row {i+1} ---")
+
+    for j in range(cols):
+        row.append(float(input(f"Enter value {j+1}: ")))
+
+    data.append(row)
+
+table = pd.DataFrame(data).stack().reset_index()
+table.columns = ["Row", "Column", "Value"]
+
+model = ols("Value ~ C(Row) + C(Column)", data=table).fit()
+result = sm.stats.anova_lm(model, typ=2)
+
+alpha = float(input("\nEnter significance level: "))
+
+print("\n===== TWO-WAY ANOVA (WOR) =====")
+
+for name, p in zip(["Row", "Column"], result["PR(>F)"]):
+    print(f"\n{name}")
+    print("P-value :", round(p, 4))
+
+    if p < alpha:
+        print("Decision : H0 is rejected")
+    else:
+        print("Decision : H0 is accepted")
+#INPUT
+# Enter number of rows: 3
+#
+# --- Row 1 ---
+# Enter value 1: 48
+# Enter value 2: 50
+# Enter value 3: 52
+#
+# --- Row 2 ---
+# Enter value 1: 55
+# Enter value 2: 57
+# Enter value 3: 59
+#
+# --- Row 3 ---
+# Enter value 1: 60
+# Enter value 2: 62
+# Enter value 3: 64
+#
+# Enter significance level: 0.05
+
+
+#3) Perform testing of hypothesis using two-way ANOVA (WR).
+
+import pandas as pd
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+
+rows = int(input("Enter number of rows: "))
+cols = int(input("Enter number of columns: "))
+n = int(input("Enter values per cell: "))
+
+row_data = []
+col_data = []
+values = []
+
+for i in range(rows):
+    for j in range(cols):
+        print(f"\n--- Row {i+1}, Column {j+1} ---")
+
+        for k in range(n):
+            value = float(input(f"Enter value {k+1}: "))
+
+            row_data.append(i)
+            col_data.append(j)
+            values.append(value)
+
+table = pd.DataFrame({
+    "Row": row_data,
+    "Column": col_data,
+    "Value": values
+})
+
+model = ols("Value ~ C(Row) * C(Column)", data=table).fit()
+result = sm.stats.anova_lm(model, typ=2)
+
+alpha = float(input("\nEnter significance level: "))
+
+print("\n===== TWO-WAY ANOVA (WR) =====")
+
+names = ["Row", "Column", "Interaction"]
+
+for name, p in zip(names, result["PR(>F)"][:3]):
+    print(f"\n{name}")
+    print("P-value :", round(p, 4))
+
+    if p < alpha:
+        print("Decision : H0 is rejected")
+    else:
+        print("Decision : H0 is accepted")
+#INPUT
+# Enter number of rows: 2
+# Enter number of columns: 2
+# Enter values per cell: 3
+#
+# --- Row 1, Column 1 ---
+# Enter value 1: 10
+# Enter value 2: 11
+# Enter value 3: 12
+#
+# --- Row 1, Column 2 ---
+# Enter value 1: 14
+# Enter value 2: 15
+# Enter value 3: 16
+#
+# --- Row 2, Column 1 ---
+# Enter value 1: 20
+# Enter value 2: 21
+# Enter value 3: 22
+#
+# --- Row 2, Column 2 ---
+# Enter value 1: 24
+# Enter value 2: 25
+# Enter value 3: 26
+#
+# Enter significance level: 0.05
+
+
+#prac 9
+#1) Perform testing of hypothesis using Sign Test.
+
+from scipy.stats import binomtest
+
+n = int(input("Enter number of values: "))
+
+data = []
+for i in range(n):
+    data.append(float(input(f"Enter value {i+1}: ")))
+
+median = float(input("Enter hypothesized median: "))
+alpha = float(input("Enter significance level: "))
+
+positive = sum(x > median for x in data)
+negative = sum(x < median for x in data)
+
+total = positive + negative
+
+p = binomtest(positive, total, 0.5).pvalue
+
+print("\n===== SIGN TEST RESULT =====")
+print("Positive =", positive)
+print("Negative =", negative)
+print("P-value =", round(p, 4))
+
+if p < alpha:
+    print("Decision : H0 is rejected")
+else:
+    print("Decision : H0 is accepted")
+#INPUT
+# Enter number of values: 10
+# Enter value 1: 48
+# Enter value 2: 52
+# Enter value 3: 49
+# Enter value 4: 51
+# Enter value 5: 47
+# Enter value 6: 53
+# Enter value 7: 50
+# Enter value 8: 54
+# Enter value 9: 46
+# Enter value 10: 52
+# Enter hypothesized median: 50
+# Enter significance level: 0.05
+
+
+#2) Perform testing of hypothesis using Wilcoxon Signed Rank Test.
+
+import numpy as np
+from scipy.stats import wilcoxon
+
+n = int(input("Enter number of pairs: "))
+
+before = []
+after = []
+
+for i in range(n):
+    before.append(float(input(f"Enter before value {i+1}: ")))
+    after.append(float(input(f"Enter after value {i+1}: ")))
+
+alpha = float(input("Enter significance level: "))
+
+w, p = wilcoxon(before, after)
+
+print("\n===== WILCOXON SIGNED RANK TEST =====")
+print("W-value =", w)
+print("P-value =", round(p, 4))
+
+if p < alpha:
+    print("Decision : H0 is rejected")
+else:
+    print("Decision : H0 is accepted")
+#INPUT
+# Enter number of pairs: 5
+# Enter before value 1: 50
+# Enter after value 1: 52
+# Enter before value 2: 48
+# Enter after value 2: 51
+# Enter before value 3: 49
+# Enter after value 3: 50
+# Enter before value 4: 51
+# Enter after value 4: 53
+# Enter before value 5: 47
+# Enter after value 5: 49
+# Enter significance level: 0.05
+
+#3) Perform testing of hypothesis using Wilcoxon Rank Sum Test (Mann-Whitney U Test).
+
+import numpy as np
+from scipy.stats import mannwhitneyu
+
+n1 = int(input("Enter number of values in sample 1: "))
+
+sample1 = []
+for i in range(n1):
+    sample1.append(float(input(f"Enter sample 1 value {i+1}: ")))
+
+n2 = int(input("Enter number of values in sample 2: "))
+
+sample2 = []
+for i in range(n2):
+    sample2.append(float(input(f"Enter sample 2 value {i+1}: ")))
+
+alpha = float(input("Enter significance level: "))
+
+u, p = mannwhitneyu(sample1, sample2, alternative="two-sided")
+
+print("\n===== MANN-WHITNEY U TEST =====")
+print("Median 1 =", np.median(sample1))
+print("Median 2 =", np.median(sample2))
+print("U-value =", u)
+print("P-value =", round(p, 4))
+
+if p < alpha:
+    print("Decision : H0 is rejected")
+else:
+    print("Decision : H0 is accepted")
+#INPUT
+# Enter number of values in sample 1: 5
+# Enter sample 1 value 1: 10
+# Enter sample 1 value 2: 12
+# Enter sample 1 value 3: 14
+# Enter sample 1 value 4: 16
+# Enter sample 1 value 5: 18
+# Enter number of values in sample 2: 5
+# Enter sample 2 value 1: 20
+# Enter sample 2 value 2: 22
+# Enter sample 2 value 3: 24
+# Enter sample 2 value 4: 26
+# Enter sample 2 value 5: 28
+# Enter significance level: 0.05
+
+
+#4) Perform testing of hypothesis for fitting/independence using Chi-Square test.
+
+from scipy.stats import chisquare, chi2_contingency
+
+choice = input("Enter test (fitting/independence): ")
+alpha = float(input("Enter alpha: "))
+
+if choice == "fitting":
+
+    n = int(input("Enter number of categories: "))
+
+    observed = []
+    expected = []
+
     for i in range(n):
-        doc = input(f"Enter Document {i + 1}: ").lower().split()
-        documents[i + 1] = doc
-    return documents
-def build_index(documents):
-    term_docs = []
+        observed.append(float(input(f"Enter observed {i+1}: ")))
 
-    for doc_id, terms in documents.items():
-        for term in terms:
-            term_docs.append((term, doc_id))
+    for i in range(n):
+        expected.append(float(input(f"Enter expected {i+1}: ")))
 
-    print("\nSTEP 1: Term and Document ID")
-    for term, doc_id in term_docs:
-        print(term, "\t", doc_id)
+    chi, p = chisquare(observed, expected)
 
-    term_docs.sort()
-
-    print("\nSTEP 2: Arranged Term and Document ID")
-    for term, doc_id in term_docs:
-        print(term, "\t", doc_id)
-
-    posting_lists = {}
-    for term, doc_id in term_docs:
-        posting_lists.setdefault(term, set()).add(doc_id)
-
-    print("\nSTEP 3: Term and Document Frequency")
-    for term in sorted(posting_lists):
-        print(f"{term}\t{len(posting_lists[term])}")
-
-    print("\nSTEP 4: Posting Lists")
-    for term in sorted(posting_lists):
-        print(f"{term} -> {sorted(posting_lists[term])}")
-
-    return posting_lists
-
-
-documents = get_documents()
-build_index(documents)
-#input
-#Enter the number of documents: 2
-#Enter Document 1: this is information retrieval subject
-#Enter Document 2: this subject is for third year computer science students
-
-#PRAC 2A
-#Implement the Boolean retrieval model and process queries.
-def accept_docs():
-    num_of_docs = int(input("Enter no. of docs: "))
-    docs = []
-
-    for i in range(1, num_of_docs + 1):
-        doc = input(f"Enter the content of doc{i}: ").lower().split()
-        docs.append(doc)
-
-    print("ALL Documents:", docs)
-
-    full_doc = []
-    for doc in docs:
-        full_doc.extend(doc)
-
-    full_terms = list(dict.fromkeys(full_doc))
-    return docs, full_terms
-
-
-def print_incident_matrix(docs, full_terms):
-    matrix = {}
-
-    for term in full_terms:
-        vector = [1 if term in doc else 0 for doc in docs]
-        matrix[term] = vector
-
-    return matrix
-
-
-def query_terms(matrix, query):
-    results = []
-    i = 0
-
-    while i < len(query):
-        word = query[i]
-
-        if word == "not" and i + 1 < len(query):
-            term = query[i + 1]
-            if term in matrix:
-                vector = [1 if v == 0 else 0 for v in matrix[term]]
-                results.append(vector)
-            i += 2
-        else:
-            if word in matrix:
-                results.append(matrix[word])
-            i += 1
-
-    if not results:
-        return [0] * len(next(iter(matrix.values())))
-
-    final = results[0]
-    for vector in results[1:]:
-        final = [a & b for a, b in zip(final, vector)]
-
-    return final
-
-
-if __name__ == "__main__":
-    docs, full_terms = accept_docs()
-    matrix = print_incident_matrix(docs, full_terms)
-
-    print("\nIncidence Matrix:")
-    for term, vector in matrix.items():
-        print(f"{term}: {vector}")
-
-    query = input("Enter query terms (space-separated): ").lower().split()
-    result = query_terms(matrix, query)
-    print("Result after evaluation (BITWISE AND):", result)
-#input
-#Enter no. of docs: 3
-#Enter the content of doc1: Taj Mahal is a beautiful monument
-#Enter the content of doc2: Victoria Memorial is also a a monument
-#Enter the content of doc3: I like to visit Agra
-#....
-#Enter query terms (space-separated): Taj Mahal NOT Agra
-
-#PRAC 2B
-#Implement the Vector Space Model and process queries.
-import math
-from collections import Counter
-
-n = int(input("Enter number of documents: "))
-documents = []
-
-for i in range(n):
-    documents.append(input("Enter Document " + str(i+1) + ": ").lower())
-
-query = input("Enter Query: ").lower()
-
-print("\nSTEP 1 : Documents and Query")
-for i in range(n):
-    print("Document", i+1, ":", documents[i])
-print("Query :", query)
-
-print("\nSTEP 2 : Frequency Table")
-for i in range(n):
-    print("\nDocument", i+1)
-    for word, count in Counter(documents[i].split()).items():
-        print(word, ":", count)
-
-vocabulary = []
-for doc in documents:
-    for word in doc.split():
-        if word not in vocabulary:
-            vocabulary.append(word)
-
-vocabulary.sort()
-
-print("\nSTEP 3 : Vocabulary")
-print(vocabulary)
-
-print("\nSTEP 4 : Arranged Vocabulary")
-print(vocabulary)
-
-print("\nSTEP 5 : Vectors")
-vectors = []
-
-for i in range(n):
-    v = []
-    for word in vocabulary:
-        v.append(1 if word in documents[i].split() else 0)
-    vectors.append(v)
-    print("Document", i+1, "Vector :", v)
-
-q = [1 if word in query.split() else 0 for word in vocabulary]
-print("Query Vector :", q)
-
-print("\nSTEP 6 : Cosine Similarity")
-similarity = []
-
-for v in vectors:
-    dot = sum(v[i] * q[i] for i in range(len(q)))
-    a = math.sqrt(sum(x*x for x in v))
-    b = math.sqrt(sum(x*x for x in q))
-    
-    if a == 0 or b == 0: 
-        sim = 0
-    else:
-        sim = dot / (a * b)
-    
-    similarity.append(sim)
-
-for i in range(n):
-    print("Document", i+1, "=", round(similarity[i], 4))
-
-print("\nSTEP 7 : Ranked Documents")
-rank = sorted(enumerate(similarity, 1), key=lambda x: x[1], reverse=True)
-
-for doc, score in rank:
-    print("Document", doc, ":", round(score, 4))
-#Input:
-#Enter number of documents: 3
-#Enter Document 1: information retrieval is fun
-#Enter Document 2: information systems are important
-#Enter Document 3: retrieval of data is important
-#Enter Query: information retrieval
-
-#Prac 3
-# Spelling Correction in IR System using Edit Distance.
-str1 = input("Enter the first String: ")
-str2 = input("Enter the second String: ")
-
-print(f"String 1: {str1}")
-print(f"String 2: {str2}")
-
-
-def edit_distance(str1, str2):
-    n = len(str1)
-    m = len(str2)
-
-    dp = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
-
-    for i in range(m + 1):
-        dp[i][0] = i
-
-    for j in range(n + 1):
-        dp[0][j] = j
-
-    for i in range(1, m + 1):
-        for j in range(1, n + 1):
-            if str2[i - 1] == str1[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1]
-            else:
-                dp[i][j] = 1 + min(
-                    dp[i - 1][j],
-                    dp[i][j - 1],
-                    dp[i - 1][j - 1]
-                )
-
-    return dp
-
-
-dp = edit_distance(str1, str2)
-
-print("\nEdit Distance Matrix:")
-for row in dp:
-    print(row)
-
-print("\nFinal Edit Distance =", dp[len(str2)][len(str1)])
-#Input:
-#Enter the first String: EDITING
-#Enter the second String: DISTANCE
-
-#Practical 4
-# Recall, Precision and F-measure.
-relevant_set = input(
-    "Enter Relevant Set [separated by comma]: "
-).split(",")
-
-retrieved_set = input(
-    "Enter Retrieved Set [separated by comma]: "
-).split(",")
-
-relevant_set = [doc.strip() for doc in relevant_set if doc.strip()]
-retrieved_set = [doc.strip() for doc in retrieved_set if doc.strip()]
-
-common = [doc for doc in retrieved_set if doc in relevant_set]
-
-R = len(relevant_set)
-A = len(retrieved_set)
-RA = len(common)
-
-print("Relevant R:", R)
-print("Retrieved A:", A)
-print("Common RA:", RA)
-
-print(f"\nCommon Points: {','.join(common)}")
-
-precision = RA / A if A != 0 else 0
-recall = RA / R if R != 0 else 0
-
-if precision + recall != 0:
-    f_measure = (2 * precision * recall) / (precision + recall)
 else:
-    f_measure = 0
 
-print(f"\nPrecision = {RA}/{A} = {precision * 100:.2f}%")
-print(f"Recall = {RA}/{R} = {recall * 100:.2f}%")
-print(f"F-measure = {f_measure * 100:.2f}%")
-##Input :
-#Enter Relevant Set [separated by comma]: d2,d5,d9,d13,d20,d25,d33,d41,d50
-#Enter Retrieved Set [separated by comma]: d5,d8,d30,d15,d33,d6,d2,d60,d17,d30
-#Prac5
-#Naive Bayes Text Categorization.
-data = [
-    ['Y', 'N', 'Y'],
-    ['N', 'Y', 'Y'],
-    ['Y', 'Y', 'Y'],
-    ['N', 'N', 'N'],
-    ['Y', 'N', 'Y'],
-    ['N', 'N', 'Y'],
-    ['Y', 'N', 'Y'],
-    ['Y', 'N', 'N'],
-    ['N', 'Y', 'Y'],
-    ['N', 'Y', 'N']
-]
+    rows = int(input("Enter rows: "))
+    cols = int(input("Enter columns: "))
 
-flu = input("Flu (Y/N): ").upper()
-covid = input("Covid (Y/N): ").upper()
+    data = []
 
-total = len(data)
-score = {}
+    for i in range(rows):
+        row = []
+        for j in range(cols):
+            row.append(float(input(f"Enter value [{i+1},{j+1}]: ")))
+        data.append(row)
 
-for fever in ["Y", "N"]:
-    rows = [row for row in data if row[2] == fever]
-    n = len(rows)
+    chi, p, df, expected = chi2_contingency(data)
 
-    prior = n / total
-    flu_prob = sum(row[1] == flu for row in rows) / n
-    covid_prob = sum(row[0] == covid for row in rows) / n
+print("\nChi-square =", round(chi, 4))
+print("P-value =", round(p, 4))
 
-    score[fever] = prior * flu_prob * covid_prob
-
-    print(f"\nFever = {fever}")
-    print("P(Flu | Fever) =", round(flu_prob, 4))
-    print("P(Covid | Fever) =", round(covid_prob, 4))
-    print("P(Fever) =", round(prior, 4))
-    print("Score =", round(score[fever], 4))
-
-print("\nP(Y | Flu,Covid):", round(score["Y"], 4))
-print("P(N | Flu,Covid):", round(score["N"], 4))
-
-if score["Y"] > score["N"]:
-    print("Predicted Fever: Y")
-elif score["N"] > score["Y"]:
-    print("Predicted Fever: N")
+if p < alpha:
+    print("H0 is rejected")
 else:
-    print("Prediction: Tie")
-#input
-#Flu (Y/N): y
-#Covid (Y/N): y
-    
-#Practical No: 6
-#Aim: Implement a clustering algorithm (K-means).
-import math
+    print("H0 is accepted")
+#INPUT
+# Enter test (fitting/independence): fitting
+# Enter alpha: 0.05
+# Enter number of categories: 4
+# Enter observed 1: 20
+# Enter observed 2: 30
+# Enter observed 3: 25
+# Enter observed 4: 25
+# Enter expected 1: 25
+# Enter expected 2: 25
+# Enter expected 3: 25
+# Enter expected 4: 25
 
-def distance(a,b):
-    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
-n = int(input("Enter number of points: "))
-p = []
+#prac 10
+#1) Kruskal-Wallis Test
+
+from scipy.stats import kruskal
+
+n = int(input("Enter number of groups: "))
+groups = []
 
 for i in range(n):
-    x = float(input("Enter X coordinate of P"+str(i+1)+": "))
-    y = float(input("Enter Y coordinate of P"+str(i+1)+": "))
-    p.append((x,y))
+    x = list(map(float, input(f"Enter Group {i+1}: ").split(",")))
+    groups.append(x)
 
-k1 = p[0]
-k2 = p[1]
+h,p = kruskal(*groups)
 
-print("\nInitial Values:")
-print("K1 =", k1)
-print("K2 =", k2)
+print("\nKruskal-Wallis Test")
+print("H =", round(h,2))
+print("p-value =", round(p,4))
 
-for i in range(2,n):
-    print("\nCalculating P"+str(i+1)+" =", p[i])
-
-    d1 = distance(p[i],k1)
-    d2 = distance(p[i],k2)
-
-    print("Distance from K1 =", round(d1,2))
-    print("Distance from K2 =", round(d2,2))
-
-    if d1 < d2:
-        print("P"+str(i+1)+" belongs to K1")
-        k1 = ((k1[0]+p[i][0])/2, (k1[1]+p[i][0])/2)
-        print("New K1 =", k1)
-    else:
-        print("P"+str(i+1)+" belongs to K2")
-        k2 = ((k2[0]+p[i][0])/2, (k2[1]+p[i][1])/2)
-        print("New K2 =", k2)
-
-print("\nFINAL RESULT")
-print("Final K1 =", k1)
-print("Final K2 =", k2)
-#input
-#Enter number of points: 7
-#Enter X coordinate of P1: 20
-#Enter Y coordinate of P1: 500
-#Enter X coordinate of P2: 40
-#Enter Y coordinate of P2: 1000
-#Enter X coordinate of P3: 30
-#Enter Y coordinate of P3: 800
-#Enter X coordinate of P4: 18
-#Enter Y coordinate of P4: 300
-#Enter X coordinate of P5: 28
-#Enter Y coordinate of P5: 1200
-#Enter X coordinate of P6: 35
-#Enter Y coordinate of P6: 1400
-#Enter X coordinate of P7: 45
-#Enter Y coordinate of P7: 1800
-#prac 7
-#Web Crawling and Indexing
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from urllib.robotparser import RobotFileParser
-
-seen = set()
-
-def crawl(url, depth=2):
-    if url in seen or depth == 0:
-        return
-    seen.add(url)
-
-    r = RobotFileParser(urljoin(url, "/robots.txt"))
-    r.read()
-
-    if not r.can_fetch("MiniCrawler", url):
-        print("Blocked:", url)
-        return
-
-    soup = BeautifulSoup(requests.get(url).text, "html.parser")
-    print("Crawled:", url)
-
-    for a in soup.find_all("a", href=True):
-        link = urljoin(url, a["href"])
-        if link.startswith("http"):
-            crawl(link, depth - 1)
-
-crawl("https://.vercel.app", 2)
-
-#Prac8
-#prac8A
-#Implement the PageRank algorithm
-
-import numpy as np
-
-n = int(input("Enter number of nodes: "))
-links = int(input("Enter the number of links: "))
-
-adj_matrix = np.zeros((n, n))
-
-print("Enter links (from_node to_node):")
-
-for _ in range(links):
-    a, b = map(int, input().split())
-    a -= 1
-    b -= 1
-    adj_matrix[b][a] = 1
-
-print("\nAdjacency Matrix:")
-print(adj_matrix)
-
-M = np.zeros((n, n))
-
-for j in range(n):
-    outgoing = sum(adj_matrix[:, j])
-
-    if outgoing != 0:
-        for i in range(n):
-            M[i][j] = adj_matrix[i][j] / outgoing
-    else:
-        # Dangling node: distribute equally to all nodes.
-        M[:, j] = 1 / n
-
-print("\nTransition Matrix M:")
-print(np.round(M, 4))
-
-iterations = int(input("Enter number of iterations: "))
-
-PR = np.ones(n) / n
-
-print("\nPageRank Vector for each iteration:")
-
-for i in range(iterations):
-    PR = np.dot(M, PR)
-    print(f"Iteration {i + 1}: {np.round(PR, 4)}")
-
-highest = np.argmax(PR)
-
-print("\nNode with highest PageRank:")
-print(
-    "Node",
-    highest + 1,
-    "with PageRank value",
-    round(PR[highest], 4)
-)
-#input
-#Enter number of nodes: 3
-#Enter the number of links: 7
-#Enter links (from_node to_node):
-#1 1
-#1 2
-#1 3
-#2 1
-#2 3
-#3 2
-#3 3
-#....
-#Enter number of iterations: 3
-#Prac8B
-#Apply HITS Algorithm to a small web graph and analyze the results.
-def create_graph(nodes, links):
-    graph = {node: [] for node in nodes}
-
-    for u, v in links:
-        if u not in graph or v not in graph:
-            raise ValueError("Link contains an unknown node.")
-        graph[u].append(v)
-
-    return graph
-
-
-def display_graph(graph):
-    print("\nDirected Graph:")
-    for node in graph:
-        print(node, "->", graph[node])
-
-def normalize(scores):
-    norm = sum(value * value for value in scores.values()) ** 0.5
-
-    if norm == 0:
-        return {node: 0 for node in scores}
-
-    return {node: scores[node] / norm for node in scores}
-
-
-def find_best(scores):
-    node = max(scores, key=scores.get)
-    return node, scores[node]
-
-
-def hits():
-    nodes = input("Enter nodes separated by space: ").split()
-
-    number_of_links = int(input("Enter number of links: "))
-    links = []
-
-    for i in range(number_of_links):
-        u, v = input(f"Link {i + 1} (from to): ").split()
-        links.append((u, v))
-
-    iterations = int(input("Enter number of iterations: "))
-
-    graph = create_graph(nodes, links)
-    display_graph(graph)
-
-    hub = {node: 1 for node in nodes}
-    authority = {node: 1 for node in nodes}
-
-    for iteration in range(1, iterations + 1):
-        authority = {
-            node: sum(
-                hub[source]
-                for source in graph
-                if node in graph[source]
-            )
-            for node in nodes
-        }
-
-        authority = normalize(authority)
-
-        hub = {
-            node: sum(authority[target] for target in graph[node])
-            for node in nodes
-        }
-
-        hub = normalize(hub)
-
-        print(f"\nIteration: {iteration}")
-        print("\nNode\tAuthority\tHub")
-
-        for node in nodes:
-            print(
-                f"{node}\t"
-                f"{authority[node]:.4f}\t\t"
-                f"{hub[node]:.4f}"
-            )
-
-    best_authority, authority_score = find_best(authority)
-    best_hub, hub_score = find_best(hub)
-
-    print("\n========================================")
-    print("Final Result")
-    print("========================================")
-    print(
-        "Best Authority Node:",
-        best_authority,
-        "Score:",
-        round(authority_score, 4)
-    )
-    print(
-        "Best Hub Node:",
-        best_hub,
-        "Score:",
-        round(hub_score, 4)
-    )
-
-
-if __name__ == "__main__":
-    hits()
-#input
-#Enter nodes separated by space: A B C D
-#Enter number of links: 8
-#Link 1 (from to): A C
-#Link 2 (from to): B A
-#Link 3 (from to): C A
-#Link 4 (from to): C B
-#Link 5 (from to): D A
-#Link 6 (from to): D B
-#Link 7 (from to): D C
-#Link 8 (from to): D D
-#Enter number of iterations: 2
-
-#Prac9
-#Program to Rank Documents using SVM (Support Vector Machine)
-import numpy as np
-from sklearn.svm import SVC
-X = np.array([
-    [2, 5],
-    [4, 3],
-    [6, 7],
-    [5, 2],
-    [7, 6],
-    [3, 4]
-])
-
-y = np.array([0, 0, 1, 1, 1, 0])
-pairs = []
-labels = []
-
-for i in range(len(X)):
-    for j in range(len(X)):
-        if y[i] > y[j]:
-            pairs.append(X[i] - X[j])
-            labels.append(1)
-            pairs.append(X[j] - X[i])
-            labels.append(0)
-pairs = np.array(pairs)
-labels = np.array(labels)
-model = SVC(kernel="linear")
-model.fit(pairs, labels)
-weights = model.coef_[0]
-scores = X @ weights
-rank = np.argsort(scores)[::-1]
-
-print("Ranked Documents:")
-
-for i in rank:
-    print(f"D{i + 1} Score = {scores[i]:.2f}")
-
-#Practical No: 10A
-#Implement text summarization algorithm (extractive).
-# If required, install:
-# python -m pip install nltk
-# python -m nltk.downloader punkt_tab
-import nltk
-from nltk.tokenize import sent_tokenize, word_tokenize
-from collections import Counter
-
-text = """Artificial Intelligence is changing the world.
-Machine learning is an important part of Artificial Intelligence.
-AI is used in healthcare and education.
-AI helps computers learn from data."""
-
-sentences = sent_tokenize(text)
-
-words = word_tokenize(text.lower())
-freq = Counter(
-    word for word in words if word.isalnum()
-)
-
-scores = {}
-
-for sentence in sentences:
-    sentence_words = word_tokenize(sentence.lower())
-    scores[sentence] = sum(
-        freq[word] for word in sentence_words if word.isalnum()
-    )
-
-summary = sorted(
-    sentences,
-    key=lambda sentence: scores[sentence],
-    reverse=True
-)[:2]
-
-print("Summary:")
-print(" ".join(summary))
-
-#Practical No: 10B
-#Aim: Build a question-answering system using information extraction.
-# If required, install:
-# python -m pip install nltk
-# python -m nltk.downloader punkt_tab
-
-import nltk
-from nltk.tokenize import word_tokenize, sent_tokenize
-
-text = """Python is a programming language.
-Python was created by Guido van Rossum.
-Python is widely used in Artificial Intelligence.
-Python was first released in 1991."""
-
-question = input("Enter question: ")
-
-q_words = {
-    word for word in word_tokenize(question.lower())
-    if word.isalnum()
-}
-
-best_sentence = ""
-best_score = 0
-
-for sentence in sent_tokenize(text):
-    words = {
-        word for word in word_tokenize(sentence.lower())
-        if word.isalnum()
-    }
-
-    score = len(q_words & words)
-
-    if score > best_score:
-        best_score = score
-        best_sentence = sentence
-
-if best_sentence:
-    print("Answer:", best_sentence)
+if p < 0.05:
+    print("Reject H0")
 else:
-    print("Answer: No relevant information found.")
-#input
-#Enter question: artifical intelligence uses which programming language widely
-#Answer: Python is a programming language.
-#Enter question: who created python
-#Answer: Python was created by Guido van Rossum.'''
+    print("Accept H0")
+#INPUT
+# Enter number of groups: 3
+# Enter Group 1: 10,12,14,16,18
+# Enter Group 2: 20,22,24,26,28
+# Enter Group 3: 30,32,34,36,38
+
+#2) Friedman Test
+
+from scipy.stats import friedmanchisquare
+
+n = int(input("Enter number of groups: "))
+groups = []
+
+for i in range(n):
+    x = list(map(float, input(f"Enter Group {i+1}: ").split(",")))
+    groups.append(x)
+
+h,p = friedmanchisquare(*groups)
+
+print("\nFriedman Test")
+print("Chi-square =", round(h,2))
+print("p-value =", round(p,4))
+
+if p < 0.05:
+    print("Reject H0")
+else:
+    print("Accept H0")
+#INPUT
+# Enter number of groups: 3
+# Enter Group 1: 10,20,30,40,50
+# Enter Group 2: 12,22,32,42,52
+# Enter Group 3: 15,25,35,45,55
+
+#3) Mood’s Median Test
+
+from scipy.stats import median_test
+
+n = int(input("Enter number of groups: "))
+groups = []
+
+for i in range(n):
+    x = list(map(float, input(f"Enter Group {i+1}: ").split(",")))
+    groups.append(x)
+
+chi,p,median,table = median_test(*groups)
+
+print("\nMood's Median Test")
+print("Chi-square =", round(chi,2))
+print("Median =", median)
+print("p-value =", round(p,4))
+
+if p < 0.05:
+    print("Reject H0")
+else:
+    print("Accept H0")
+#INPUT
+# Enter number of groups: 3
+# Enter Group 1: 10,20,30,40,50
+# Enter Group 2: 12,22,32,42,52
+# Enter Group 3: 15,25,35,45,55
